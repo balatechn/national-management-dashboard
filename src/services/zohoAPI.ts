@@ -2,9 +2,9 @@ import axios from 'axios';
 
 // Zoho API Configuration
 const ZOHO_CONFIG = {
-  CLIENT_ID: process.env.VITE_ZOHO_CLIENT_ID || '',
-  CLIENT_SECRET: process.env.VITE_ZOHO_CLIENT_SECRET || '',
-  REDIRECT_URI: process.env.VITE_ZOHO_REDIRECT_URI || 'http://localhost:3000/auth/callback',
+  CLIENT_ID: import.meta.env.VITE_ZOHO_CLIENT_ID || '',
+  CLIENT_SECRET: import.meta.env.VITE_ZOHO_CLIENT_SECRET || '',
+  REDIRECT_URI: import.meta.env.VITE_ZOHO_REDIRECT_URI || 'http://localhost:3000/auth/callback',
   SCOPES: 'ZohoPeople.employee.ALL,ZohoPayroll.employees.ALL',
   BASE_URL: 'https://people.zoho.com/people/api',
   PAYROLL_BASE_URL: 'https://payroll.zoho.com/api/v1',

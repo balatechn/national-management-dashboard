@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -27,11 +27,72 @@ interface ProjectTableProps {
   maxRows?: number;
 }
 
+interface GroupStats {
+  totalProjects: number;
+  completedProjects: number;
+  avgCompletion: number;
+  totalOpenTasks: number;
+  totalClosedTasks: number;
+  activeProjects: number;
+}
+
 const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows = 10 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'id' | 'name' | 'completion' | 'status'>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [viewMode, setViewMode] = useState<'table' | 'grouped'>('grouped');
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+
+  // Calculate group statistics
+  const groupStats = useMemo(() => {
+    const stats: Record<string, GroupStats> = {};
+    
+    PROJECT_DATA.forEach(project => {
+      const group = project.group;
+      if (!stats[group]) {
+        stats[group] = {
+          totalProjects: 0,
+          completedProjects: 0,
+          avgCompletion: 0,
+          totalOpenTasks: 0,
+          totalClosedTasks: 0,
+          activeProjects: 0
+        };
+      }
+      
+      stats[group].totalProjects++;
+      stats[group].totalOpenTasks += project.openTasks;
+      stats[group].totalClosedTasks += project.closedTasks;
+      
+      const completion = parseInt(project.completion.replace('%', ''));
+      if (completion >= 100) stats[group].completedProjects++;
+      if (project.status === 'Active') stats[group].activeProjects++;
+    });
+    
+    // Calculate average completion for each group
+    Object.keys(stats).forEach(group => {
+      const groupProjects = PROJECT_DATA.filter(p => p.group === group);
+      const totalCompletion = groupProjects.reduce((sum, p) => 
+        sum + parseInt(p.completion.replace('%', '')), 0);
+      stats[group].avgCompletion = Math.round(totalCompletion / groupProjects.length);
+    });
+    
+    return stats;
+  }, []);
+
+  // Group projects by group
+  const groupedProjects = useMemo(() => {
+    const groups: Record<string, typeof PROJECT_DATA> = {};
+    PROJECT_DATA.forEach(project => {
+      if (!groups[project.group]) {
+        groups[project.group] = [];
+      }
+      groups[project.group].push(project);
+    });
+    return groups;
+  }, []);
 
   // Filter and sort projects
   const filteredProjects = PROJECT_DATA.filter(project =>
@@ -41,7 +102,12 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
     project.group.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const sortedProjects = [...filteredProjects].sort((a, b) => {
+  // Filter by selected group if in drill-down mode
+  const displayProjects = selectedGroup 
+    ? filteredProjects.filter(p => p.group === selectedGroup)
+    : filteredProjects;
+
+  const sortedProjects = [...displayProjects].sort((a, b) => {
     if (sortBy === 'completion') {
       const aValue = parseInt(a.completion.replace('%', ''));
       const bValue = parseInt(b.completion.replace('%', ''));
@@ -70,6 +136,26 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
     }
   };
 
+  const toggleGroupExpansion = (group: string) => {
+    const newExpanded = new Set(expandedGroups);
+    if (newExpanded.has(group)) {
+      newExpanded.delete(group);
+    } else {
+      newExpanded.add(group);
+    }
+    setExpandedGroups(newExpanded);
+  };
+
+  const handleGroupDrillDown = (group: string) => {
+    setSelectedGroup(group);
+    setViewMode('table');
+    setCurrentPage(1);
+  };
+
+  const handleBackToOverview = () => {
+    setSelectedGroup(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Active': return 'text-green-600 bg-green-50';
@@ -81,8 +167,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
     }
   };
 
-  const getCompletionColor = (completion: string) => {
-    const percent = parseInt(completion.replace('%', ''));
+  const getCompletionColor = (completion: string | number) => {
+    const percent = typeof completion === 'string' ? parseInt(completion.replace('%', '')) : completion;
     if (percent >= 90) return 'text-green-700 bg-green-100';
     if (percent >= 70) return 'text-blue-700 bg-blue-100';
     if (percent >= 50) return 'text-yellow-700 bg-yellow-100';
@@ -90,136 +176,312 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
     return 'text-red-700 bg-red-100';
   };
 
+  const renderGroupedView = () => {
+    return (
+      <div className="space-y-4">
+        {Object.entries(groupedProjects).map(([group, projects]) => {
+          const stats = groupStats[group];
+          const isExpanded = expandedGroups.has(group);
+          
+          return (
+            <Card key={group} className="border border-slate-200 backdrop-blur-sm bg-white/50">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleGroupExpansion(group)}
+                        className="p-1 h-6 w-6 text-slate-600 hover:text-slate-800"
+                      >
+                        {isExpanded ? '−' : '+'}
+                      </Button>
+                      <CardTitle className="text-lg text-slate-800 font-semibold">
+                        {group}
+                      </CardTitle>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleGroupDrillDown(group)}
+                        className="text-xs border-slate-300 text-slate-600 hover:bg-slate-50"
+                      >
+                        Drill Down →
+                      </Button>
+                    </div>
+                    
+                    {/* Group Statistics */}
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-slate-800">{stats.totalProjects}</div>
+                        <div className="text-xs text-slate-600">Total Projects</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">{stats.activeProjects}</div>
+                        <div className="text-xs text-slate-600">Active</div>
+                      </div>
+                      <div className="text-center">
+                        <div className={`text-2xl font-bold ${getCompletionColor(stats.avgCompletion).split(' ')[0]}`}>
+                          {stats.avgCompletion}%
+                        </div>
+                        <div className="text-xs text-slate-600">Avg Progress</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">{stats.completedProjects}</div>
+                        <div className="text-xs text-slate-600">Completed</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">{stats.totalOpenTasks}</div>
+                        <div className="text-xs text-slate-600">Open Tasks</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">{stats.totalClosedTasks}</div>
+                        <div className="text-xs text-slate-600">Closed Tasks</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              {isExpanded && (
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-200">
+                          <th className="text-left p-2 text-sm font-medium text-slate-700">Project ID</th>
+                          <th className="text-left p-2 text-sm font-medium text-slate-700">Name</th>
+                          <th className="text-left p-2 text-sm font-medium text-slate-700">Owner</th>
+                          <th className="text-left p-2 text-sm font-medium text-slate-700">Progress</th>
+                          <th className="text-left p-2 text-sm font-medium text-slate-700">Status</th>
+                          <th className="text-left p-2 text-sm font-medium text-slate-700">Tasks</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {projects.slice(0, 5).map((project) => (
+                          <tr key={project.id} className="border-b border-slate-100 hover:bg-slate-50">
+                            <td className="p-2 text-sm text-slate-800 font-medium">{project.id}</td>
+                            <td className="p-2 text-sm text-slate-700 max-w-xs truncate" title={project.name}>
+                              {project.name}
+                            </td>
+                            <td className="p-2 text-sm text-slate-600">{project.owner}</td>
+                            <td className="p-2">
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${getCompletionColor(project.completion)}`}>
+                                {project.completion}
+                              </span>
+                            </td>
+                            <td className="p-2">
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(project.status)}`}>
+                                {project.status}
+                              </span>
+                            </td>
+                            <td className="p-2 text-sm">
+                              <div className="flex space-x-2">
+                                <span className="text-green-600">{project.closedTasks} ✓</span>
+                                <span className="text-orange-600">{project.openTasks} ⏳</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {projects.length > 5 && (
+                      <div className="mt-2 text-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleGroupDrillDown(group)}
+                          className="text-xs border-slate-300 text-slate-600 hover:bg-slate-50"
+                        >
+                          View All {projects.length} Projects →
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <Card className="bg-gradient-to-br from-white via-amber-50 to-yellow-50 border-amber-200 shadow-lg">
+    <Card className="backdrop-blur-sm bg-gradient-to-br from-slate-900/90 via-purple-900/90 to-slate-900/90 border border-purple-500/20 shadow-2xl">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-xl text-amber-800">Project Portfolio</CardTitle>
-            <CardDescription className="text-amber-700">
-              Comprehensive view of all active projects ({filteredProjects.length} projects)
+            <div className="flex items-center space-x-4">
+              <CardTitle className="text-xl text-white font-bold">
+                {selectedGroup ? `${selectedGroup} Projects` : 'Project Portfolio'}
+              </CardTitle>
+              {selectedGroup && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBackToOverview}
+                  className="border-purple-400/50 text-purple-300 hover:bg-purple-400/10"
+                >
+                  ← Back to Overview
+                </Button>
+              )}
+            </div>
+            <CardDescription className="text-purple-200">
+              {selectedGroup 
+                ? `Detailed view of ${selectedGroup} projects (${displayProjects.length} projects)`
+                : `Comprehensive project management view (${filteredProjects.length} projects)`
+              }
             </CardDescription>
           </div>
-          {searchable && (
-            <div className="w-64">
-              <Input
-                placeholder="Search projects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="border-amber-300 focus:border-amber-500"
-              />
-            </div>
-          )}
+          <div className="flex items-center space-x-3">
+            {!selectedGroup && (
+              <div className="flex bg-slate-800/50 rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                  className="text-xs text-white"
+                >
+                  Table View
+                </Button>
+                <Button
+                  variant={viewMode === 'grouped' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grouped')}
+                  className="text-xs text-white"
+                >
+                  Group View
+                </Button>
+              </div>
+            )}
+            {searchable && (
+              <div className="w-64">
+                <Input
+                  placeholder="Search projects..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-slate-800/50 border-purple-400/30 text-white placeholder-purple-300 focus:border-purple-400"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="border-b border-amber-200">
-                <th 
-                  className="text-left p-3 font-medium text-amber-800 cursor-pointer hover:bg-amber-100 transition-colors"
-                  onClick={() => handleSort('id')}
-                >
-                  Project ID {sortBy === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th 
-                  className="text-left p-3 font-medium text-amber-800 cursor-pointer hover:bg-amber-100 transition-colors"
-                  onClick={() => handleSort('name')}
-                >
-                  Project Name {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="text-left p-3 font-medium text-amber-800">Owner</th>
-                <th className="text-left p-3 font-medium text-amber-800">Group</th>
-                <th 
-                  className="text-left p-3 font-medium text-amber-800 cursor-pointer hover:bg-amber-100 transition-colors"
-                  onClick={() => handleSort('completion')}
-                >
-                  Progress {sortBy === 'completion' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th 
-                  className="text-left p-3 font-medium text-amber-800 cursor-pointer hover:bg-amber-100 transition-colors"
-                  onClick={() => handleSort('status')}
-                >
-                  Status {sortBy === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="text-left p-3 font-medium text-amber-800">Tasks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentProjects.map((project, index) => (
-                <tr 
-                  key={project.id} 
-                  className={`border-b border-amber-100 hover:bg-amber-50 transition-colors ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-amber-25'
-                  }`}
-                >
-                  <td className="p-3">
-                    <span className="font-medium text-amber-900">{project.id}</span>
-                  </td>
-                  <td className="p-3 max-w-xs">
-                    <div className="text-amber-900 font-medium truncate" title={project.name}>
-                      {project.name}
-                    </div>
-                  </td>
-                  <td className="p-3 text-amber-700">{project.owner}</td>
-                  <td className="p-3">
-                    <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800">
-                      {project.group}
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <span className={`text-sm px-2 py-1 rounded-full font-medium ${getCompletionColor(project.completion)}`}>
-                      {project.completion}
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <span className={`text-sm px-2 py-1 rounded-full font-medium ${getStatusColor(project.status)}`}>
-                      {project.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-sm text-amber-700">
-                    <div className="flex space-x-2">
-                      <span className="text-green-600">{project.closedTasks} ✓</span>
-                      <span className="text-orange-600">{project.openTasks} ⏳</span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {viewMode === 'grouped' && !selectedGroup ? (
+          renderGroupedView()
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-purple-400/20">
+                    <th 
+                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      onClick={() => handleSort('id')}
+                    >
+                      Project ID {sortBy === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th 
+                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      onClick={() => handleSort('name')}
+                    >
+                      Project Name {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="text-left p-3 font-medium text-purple-200">Owner</th>
+                    <th className="text-left p-3 font-medium text-purple-200">Group</th>
+                    <th 
+                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      onClick={() => handleSort('completion')}
+                    >
+                      Progress {sortBy === 'completion' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th 
+                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      onClick={() => handleSort('status')}
+                    >
+                      Status {sortBy === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="text-left p-3 font-medium text-purple-200">Tasks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentProjects.map((project, index) => (
+                    <tr 
+                      key={project.id} 
+                      className={`border-b border-purple-400/10 hover:bg-purple-400/5 transition-colors ${
+                        index % 2 === 0 ? 'bg-slate-800/20' : 'bg-slate-800/10'
+                      }`}
+                    >
+                      <td className="p-3">
+                        <span className="font-medium text-white">{project.id}</span>
+                      </td>
+                      <td className="p-3 max-w-xs">
+                        <div className="text-white font-medium truncate" title={project.name}>
+                          {project.name}
+                        </div>
+                      </td>
+                      <td className="p-3 text-purple-200">{project.owner}</td>
+                      <td className="p-3">
+                        <span className="text-xs px-2 py-1 rounded-full bg-purple-400/20 text-purple-200 border border-purple-400/30">
+                          {project.group}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span className={`text-sm px-2 py-1 rounded-full font-medium ${getCompletionColor(project.completion)}`}>
+                          {project.completion}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span className={`text-sm px-2 py-1 rounded-full font-medium ${getStatusColor(project.status)}`}>
+                          {project.status}
+                        </span>
+                      </td>
+                      <td className="p-3 text-sm text-purple-200">
+                        <div className="flex space-x-2">
+                          <span className="text-green-400">{project.closedTasks} ✓</span>
+                          <span className="text-orange-400">{project.openTasks} ⏳</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-between items-center mt-6 pt-4 border-t border-amber-200">
-            <div className="text-sm text-amber-700">
-              Showing {startIndex + 1} to {Math.min(startIndex + maxRows, sortedProjects.length)} of {sortedProjects.length} projects
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="border-amber-300 text-amber-800 hover:bg-amber-50"
-              >
-                Previous
-              </Button>
-              <span className="flex items-center px-3 text-amber-800">
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="border-amber-300 text-amber-800 hover:bg-amber-50"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-between items-center mt-6 pt-4 border-t border-purple-400/20">
+                <div className="text-sm text-purple-200">
+                  Showing {startIndex + 1} to {Math.min(startIndex + maxRows, sortedProjects.length)} of {sortedProjects.length} projects
+                </div>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="border-purple-400/30 text-purple-200 hover:bg-purple-400/10"
+                  >
+                    Previous
+                  </Button>
+                  <span className="flex items-center px-3 text-purple-200">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="border-purple-400/30 text-purple-200 hover:bg-purple-400/10"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
