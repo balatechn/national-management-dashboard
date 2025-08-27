@@ -289,7 +289,7 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
       {hasPermission('canUpload') && (
         <Card className="bg-gradient-to-r from-white to-amber-50 border-amber-300 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-lg text-amber-800">CSV File Upload</CardTitle>
+            <CardTitle className="text-xl font-extralight bg-gradient-to-r from-amber-700 via-yellow-600 to-orange-700 bg-clip-text text-transparent tracking-wide">CSV File Upload</CardTitle>
             <CardDescription className="text-amber-700">Upload CSV files to update dashboard data</CardDescription>
           </CardHeader>
           <CardContent>
@@ -361,12 +361,12 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
         {/* Department Data */}
         <Card className="group bg-gradient-to-br from-white/90 via-stone-50/30 to-gray-100/30 backdrop-blur-sm border border-gray-200/50 shadow-xl hover:shadow-2xl transition-all duration-500">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-light text-gray-800">
+            <CardTitle className="text-2xl font-display font-light text-amber-800 tracking-wide antialiased">
               {type === 'people' || type === 'payroll' ? 'Department Distribution' : 
                type === 'project' ? 'Project Categories' :
                type === 'crm' ? 'Lead Pipeline' : 'Financial Overview'}
             </CardTitle>
-            <CardDescription className="text-gray-600 font-light">
+            <CardDescription className="text-amber-700 font-serif font-light text-base tracking-wide antialiased">
               {hasPermission('canDrillDown') 
                 ? 'Click on items to explore detailed insights' 
                 : 'Overview dashboard with comprehensive metrics'
@@ -401,7 +401,7 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
         {/* Elegant Quick Actions */}
         <Card className="group bg-gradient-to-br from-white/80 via-amber-50/30 to-yellow-50/30 backdrop-blur-sm border border-amber-100/50 shadow-xl hover:shadow-2xl transition-all duration-500">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-light text-amber-800">Quick Actions</CardTitle>
+            <CardTitle className="text-2xl font-extralight bg-gradient-to-r from-amber-700 via-yellow-600 to-orange-700 bg-clip-text text-transparent tracking-wide">Quick Actions</CardTitle>
             <CardDescription className="text-amber-600/80 font-light">Intelligent tools for enhanced productivity</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -490,10 +490,10 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle className="text-xl text-amber-800">
+                <CardTitle className="text-2xl font-extralight bg-gradient-to-r from-amber-700 via-yellow-600 to-orange-700 bg-clip-text text-transparent tracking-wide">
                   {selectedDepartment} {type === 'project' ? 'Projects' : 'Department'} Details
                 </CardTitle>
-                <CardDescription className="text-amber-700">
+                <CardDescription className="text-amber-700 font-light text-base tracking-wide">
                   Detailed {type === 'project' ? 'project' : 'employee'} information for {selectedDepartment}
                 </CardDescription>
               </div>
