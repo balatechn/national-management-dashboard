@@ -184,7 +184,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
           const isExpanded = expandedGroups.has(group);
           
           return (
-            <Card key={group} className="border border-slate-200 backdrop-blur-sm bg-white/50">
+            <Card key={group} className="border border-gray-300/50 backdrop-blur-sm bg-white/80">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -308,12 +308,12 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
   };
 
   return (
-    <Card className="backdrop-blur-sm bg-gradient-to-br from-slate-900/90 via-purple-900/90 to-slate-900/90 border border-purple-500/20 shadow-2xl">
+    <Card className="backdrop-blur-sm bg-gradient-to-br from-white/95 via-stone-50/95 to-gray-100/95 border border-gray-300/50 shadow-2xl">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
             <div className="flex items-center space-x-4">
-              <CardTitle className="text-xl text-white font-bold">
+              <CardTitle className="text-xl text-gray-800 font-bold">
                 {selectedGroup ? `${selectedGroup} Projects` : 'Project Portfolio'}
               </CardTitle>
               {selectedGroup && (
@@ -321,13 +321,13 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
                   variant="outline"
                   size="sm"
                   onClick={handleBackToOverview}
-                  className="border-purple-400/50 text-purple-300 hover:bg-purple-400/10"
+                  className="border-gray-400/50 text-gray-600 hover:bg-gray-200/50"
                 >
                   ← Back to Overview
                 </Button>
               )}
             </div>
-            <CardDescription className="text-purple-200">
+            <CardDescription className="text-gray-600">
               {selectedGroup 
                 ? `Detailed view of ${selectedGroup} projects (${displayProjects.length} projects)`
                 : `Comprehensive project management view (${filteredProjects.length} projects)`
@@ -336,12 +336,12 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
           </div>
           <div className="flex items-center space-x-3">
             {!selectedGroup && (
-              <div className="flex bg-slate-800/50 rounded-lg p-1">
+              <div className="flex bg-gray-200/80 rounded-lg p-1">
                 <Button
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('table')}
-                  className="text-xs text-white"
+                  className="text-xs text-gray-700"
                 >
                   Table View
                 </Button>
@@ -349,7 +349,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
                   variant={viewMode === 'grouped' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('grouped')}
-                  className="text-xs text-white"
+                  className="text-xs text-gray-700"
                 >
                   Group View
                 </Button>
@@ -361,7 +361,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
                   placeholder="Search projects..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-slate-800/50 border-purple-400/30 text-white placeholder-purple-300 focus:border-purple-400"
+                  className="bg-white/80 border-gray-300/50 text-gray-800 placeholder-gray-500 focus:border-gray-400"
                 />
               </div>
             )}
@@ -376,55 +376,55 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-purple-400/20">
+                  <tr className="border-b border-gray-300/30">
                     <th 
-                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      className="text-left p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100/50 transition-colors"
                       onClick={() => handleSort('id')}
                     >
                       Project ID {sortBy === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </th>
                     <th 
-                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      className="text-left p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100/50 transition-colors"
                       onClick={() => handleSort('name')}
                     >
                       Project Name {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th className="text-left p-3 font-medium text-purple-200">Owner</th>
-                    <th className="text-left p-3 font-medium text-purple-200">Group</th>
+                    <th className="text-left p-3 font-medium text-gray-700">Owner</th>
+                    <th className="text-left p-3 font-medium text-gray-700">Group</th>
                     <th 
-                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      className="text-left p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100/50 transition-colors"
                       onClick={() => handleSort('completion')}
                     >
                       Progress {sortBy === 'completion' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </th>
                     <th 
-                      className="text-left p-3 font-medium text-purple-200 cursor-pointer hover:bg-purple-400/10 transition-colors"
+                      className="text-left p-3 font-medium text-gray-700 cursor-pointer hover:bg-gray-100/50 transition-colors"
                       onClick={() => handleSort('status')}
                     >
                       Status {sortBy === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th className="text-left p-3 font-medium text-purple-200">Tasks</th>
+                    <th className="text-left p-3 font-medium text-gray-700">Tasks</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentProjects.map((project, index) => (
                     <tr 
                       key={project.id} 
-                      className={`border-b border-purple-400/10 hover:bg-purple-400/5 transition-colors ${
-                        index % 2 === 0 ? 'bg-slate-800/20' : 'bg-slate-800/10'
+                      className={`border-b border-gray-200/50 hover:bg-gray-100/30 transition-colors ${
+                        index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/30'
                       }`}
                     >
                       <td className="p-3">
-                        <span className="font-medium text-white">{project.id}</span>
+                        <span className="font-medium text-gray-800">{project.id}</span>
                       </td>
                       <td className="p-3 max-w-xs">
-                        <div className="text-white font-medium truncate" title={project.name}>
+                        <div className="text-gray-800 font-medium truncate" title={project.name}>
                           {project.name}
                         </div>
                       </td>
-                      <td className="p-3 text-purple-200">{project.owner}</td>
+                      <td className="p-3 text-gray-600">{project.owner}</td>
                       <td className="p-3">
-                        <span className="text-xs px-2 py-1 rounded-full bg-purple-400/20 text-purple-200 border border-purple-400/30">
+                        <span className="text-xs px-2 py-1 rounded-full bg-gray-200/60 text-gray-700 border border-gray-300/50">
                           {project.group}
                         </span>
                       </td>
@@ -438,10 +438,10 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
                           {project.status}
                         </span>
                       </td>
-                      <td className="p-3 text-sm text-purple-200">
+                      <td className="p-3 text-sm text-gray-600">
                         <div className="flex space-x-2">
-                          <span className="text-green-400">{project.closedTasks} ✓</span>
-                          <span className="text-orange-400">{project.openTasks} ⏳</span>
+                          <span className="text-green-600">{project.closedTasks} ✓</span>
+                          <span className="text-orange-600">{project.openTasks} ⏳</span>
                         </div>
                       </td>
                     </tr>
@@ -452,8 +452,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-between items-center mt-6 pt-4 border-t border-purple-400/20">
-                <div className="text-sm text-purple-200">
+              <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-300/30">
+                <div className="text-sm text-gray-600">
                   Showing {startIndex + 1} to {Math.min(startIndex + maxRows, sortedProjects.length)} of {sortedProjects.length} projects
                 </div>
                 <div className="flex space-x-2">
@@ -462,11 +462,11 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
                     size="sm"
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="border-purple-400/30 text-purple-200 hover:bg-purple-400/10"
+                    className="border-gray-300/50 text-gray-600 hover:bg-gray-100/50"
                   >
                     Previous
                   </Button>
-                  <span className="flex items-center px-3 text-purple-200">
+                  <span className="flex items-center px-3 text-gray-600">
                     Page {currentPage} of {totalPages}
                   </span>
                   <Button
@@ -474,7 +474,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchable = true, maxRows 
                     size="sm"
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="border-purple-400/30 text-purple-200 hover:bg-purple-400/10"
+                    className="border-gray-300/50 text-gray-600 hover:bg-gray-100/50"
                   >
                     Next
                   </Button>

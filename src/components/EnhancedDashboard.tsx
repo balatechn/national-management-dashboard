@@ -329,7 +329,7 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
         {currentData.kpis.map((kpi, index) => (
           <Card 
             key={index} 
-            className={`group bg-gradient-to-br from-white/80 via-amber-50/50 to-yellow-50/50 backdrop-blur-sm border border-amber-100/50 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 ${
+            className={`group bg-gradient-to-br from-white/90 via-stone-50/50 to-gray-100/50 backdrop-blur-sm border border-gray-200/50 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 ${
               editMode && hasPermission('canEdit') ? 'ring-2 ring-amber-300' : ''
             }`}
           >
@@ -359,14 +359,14 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
       {/* Elegant Dashboard Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Department Data */}
-        <Card className="group bg-gradient-to-br from-white/80 via-amber-50/30 to-yellow-50/30 backdrop-blur-sm border border-amber-100/50 shadow-xl hover:shadow-2xl transition-all duration-500">
+        <Card className="group bg-gradient-to-br from-white/90 via-stone-50/30 to-gray-100/30 backdrop-blur-sm border border-gray-200/50 shadow-xl hover:shadow-2xl transition-all duration-500">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-light text-amber-800">
+            <CardTitle className="text-xl font-light text-gray-800">
               {type === 'people' || type === 'payroll' ? 'Department Distribution' : 
                type === 'project' ? 'Project Categories' :
                type === 'crm' ? 'Lead Pipeline' : 'Financial Overview'}
             </CardTitle>
-            <CardDescription className="text-amber-600/80 font-light">
+            <CardDescription className="text-gray-600 font-light">
               {hasPermission('canDrillDown') 
                 ? 'Click on items to explore detailed insights' 
                 : 'Overview dashboard with comprehensive metrics'

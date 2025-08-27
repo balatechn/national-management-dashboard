@@ -17,23 +17,37 @@ function DashboardContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-stone-50 to-gray-200 relative overflow-hidden">
+      {/* Marble-inspired Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-4 -left-4 w-72 h-72 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-        <div className="absolute top-1/2 -right-4 w-72 h-72 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-teal-400/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
+        <div className="absolute -top-4 -left-4 w-72 h-72 bg-gradient-to-r from-stone-300/30 to-gray-300/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+        <div className="absolute top-1/2 -right-4 w-72 h-72 bg-gradient-to-r from-slate-300/30 to-stone-400/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-gradient-to-r from-gray-300/30 to-slate-300/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
+        
+        {/* Marble veining effect */}
+        <div className="absolute inset-0 opacity-20">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="marble" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+                <path d="M0,100 Q50,20 100,100 T200,100" stroke="#6B7280" strokeWidth="1" fill="none" opacity="0.3"/>
+                <path d="M0,150 Q80,80 160,150 T320,150" stroke="#9CA3AF" strokeWidth="0.5" fill="none" opacity="0.4"/>
+                <path d="M50,0 Q100,50 150,0 T250,0" stroke="#6B7280" strokeWidth="0.8" fill="none" opacity="0.2"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#marble)"/>
+          </svg>
+        </div>
       </div>
       
       {/* Header */}
-      <header className="relative z-10 bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-xl">
+      <header className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-gray-300/50 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex-1">
-              <h1 className="text-4xl font-light bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-light bg-gradient-to-r from-gray-700 via-stone-600 to-gray-800 bg-clip-text text-transparent">
                 National Management Dashboard
               </h1>
-              <p className="text-white/70 mt-2 font-light">
+              <p className="text-gray-600 mt-2 font-light">
                 Advanced Business Intelligence & Analytics Platform
               </p>
             </div>
@@ -48,15 +62,15 @@ function DashboardContent() {
                   e.currentTarget.style.display = 'none';
                 }}
               />
-              <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
-                <span className="text-white/90 font-light">Welcome, </span>
-                <span className="text-amber-300 font-medium">{user?.username}</span>
+              <div className="bg-gray-200/80 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-300/50">
+                <span className="text-gray-700 font-light">Welcome, </span>
+                <span className="text-stone-600 font-medium">{user?.username}</span>
               </div>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={logout}
-                className="border-white/30 text-white/90 hover:bg-white/10 backdrop-blur-sm"
+                className="border-gray-400/50 text-gray-700 hover:bg-gray-200/50 backdrop-blur-sm"
               >
                 Logout
               </Button>
@@ -66,7 +80,7 @@ function DashboardContent() {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="relative z-10 bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0">
+      <div className="relative z-10 bg-white/60 backdrop-blur-xl border-b border-gray-300/30 sticky top-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-2 py-6 overflow-x-auto">
             {modules.map((module) => (
@@ -75,8 +89,8 @@ function DashboardContent() {
                 onClick={() => setActiveTab(module.id as any)}
                 className={`group flex items-center space-x-3 px-8 py-4 rounded-2xl text-sm font-medium transition-all duration-500 whitespace-nowrap ${
                   activeTab === module.id
-                    ? "bg-gradient-to-r from-amber-400/90 to-yellow-400/90 text-white shadow-2xl transform scale-105 backdrop-blur-sm border border-amber-300/50"
-                    : "text-white/70 hover:bg-white/10 border border-white/20 hover:border-white/30 backdrop-blur-sm hover:text-white/90"
+                    ? "bg-gradient-to-r from-stone-400/90 to-gray-500/90 text-white shadow-2xl transform scale-105 backdrop-blur-sm border border-stone-300/50"
+                    : "text-gray-600 hover:bg-gray-200/60 border border-gray-300/50 hover:border-gray-400/60 backdrop-blur-sm hover:text-gray-800"
                 }`}
               >
                 <span className="text-xl group-hover:scale-110 transition-transform duration-300">{module.icon}</span>
@@ -92,7 +106,7 @@ function DashboardContent() {
 
       {/* Dashboard Content */}
       <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20 shadow-2xl p-8">
+        <div className="backdrop-blur-xl bg-white/80 rounded-3xl border border-gray-300/50 shadow-2xl p-8">
           {activeTab === "people" && (
             <EnhancedDashboard title="People & Payroll Management" type="people" />
           )}
