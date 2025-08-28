@@ -194,21 +194,6 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
     setEditMode(!editMode);
   };
 
-  const clearProjectData = () => {
-    // Reset selected department
-    setSelectedDepartment(null);
-    
-    // Close all panels
-    setShowAPITester(false);
-    setShowDataManager(false);
-    setEditMode(false);
-    
-    // Clear localStorage
-    localStorage.clear();
-    
-    alert('Project data cleared! Dashboard reset to clean state.');
-  };
-
   const getRoleInfo = () => {
     switch (user?.role) {
       case UserRole.VIEWER:

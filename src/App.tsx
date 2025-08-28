@@ -8,7 +8,7 @@ import ZohoPeopleDashboard from "./components/ZohoPeopleDashboard";
 import AuthCallback from "./components/AuthCallback";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
-import { Users, DollarSign, BarChart3, UserCheck, Home, TrendingUp, Calendar, AlertCircle } from "lucide-react";
+import { Users, DollarSign, BarChart3, UserCheck, Home, TrendingUp, Calendar } from "lucide-react";
 
 // Overview Dashboard Component
 function OverviewDashboard() {

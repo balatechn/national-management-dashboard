@@ -172,19 +172,6 @@ const ZohoAPITester: React.FC = () => {
 
     setIsRunning(false);
   };
-
-  // Handle OAuth redirect (this would be called after user authorizes)
-  const handleOAuthCallback = async (code: string) => {
-    try {
-      await zohoAPI.exchangeCodeForToken(code);
-      // Re-run auth and API tests
-      await testAuthStatus();
-      await testAPIConnection();
-    } catch (error) {
-      console.error('OAuth callback error:', error);
-    }
-  };
-
   // Start OAuth flow
   const startOAuthFlow = () => {
     if (authUrl) {
