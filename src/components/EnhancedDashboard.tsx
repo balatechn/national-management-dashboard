@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Input } from './ui/input';
 import ProjectTable from './ProjectTable';
 import ZohoAPITester from './ZohoAPITester';
+import DataClearManager from './DataClearManager';
 
 interface DrillDownData {
   department: string;
@@ -54,45 +55,21 @@ const DRILL_DOWN_DATA: Record<string, DrillDownData> = {
 };
 
 const PROJECT_DRILL_DOWN_DATA: Record<string, any> = {
-  "NIPL Infrastructure": {
-    department: 'NIPL Infrastructure',
-    projects: [
-      { id: 'NA-110', name: 'Aug tracker', owner: 'Karthik M K', status: 'Active', completion: '40%', group: 'Finance' },
-      { id: 'NA-104', name: 'Hogenakkal Construction tender', owner: 'Munavar Sheik', status: 'Active', completion: '60%', group: 'NIPL' },
-      { id: 'NA-98', name: 'D&C TWIN TUNNEL Package-2', owner: 'Munavar Sheik', status: 'Active', completion: '0%', group: 'NIPL' },
-      { id: 'NA-97', name: 'D&C TWIN TUNNEL Package-1', owner: 'Munavar Sheik', status: 'Active', completion: '0%', group: 'NIPL' },
-      { id: 'NA-84', name: 'Bikaner Airport MES Phase-II', owner: 'Munavar Sheik', status: 'Active', completion: '71%', group: 'NIPL' }
-    ]
+  "Infrastructure": {
+    department: 'Infrastructure',
+    projects: []
   },
-  "Real Estate": {
-    department: 'Real Estate',
-    projects: [
-      { id: 'NA-107', name: 'Kimmane Resort - Bangalore', owner: 'Nirup Jayanth', status: 'Active', completion: '100%', group: 'Ungrouped' },
-      { id: 'NA-106', name: 'Kimmane Residential', owner: 'Nirup Jayanth', status: 'Active', completion: '58%', group: 'Ungrouped' },
-      { id: 'NA-87', name: 'Dal Moro - Cafe Interiors', owner: 'Siddharth Venkat', status: 'Active', completion: '8%', group: 'Real Estate' },
-      { id: 'NA-27', name: 'Padmanabha Nagar', owner: 'Nirup Jayanth', status: 'In Progress', completion: '60%', group: 'Real Estate' },
-      { id: 'NA-17', name: 'Kimmane Residential - Shimoga', owner: 'Nirup Jayanth', status: 'In Progress', completion: '85%', group: 'Real Estate' }
-    ]
+  "Development": {
+    department: 'Development',
+    projects: []
   },
   "Consulting": {
     department: 'Consulting',
-    projects: [
-      { id: 'NA-101', name: 'Daily updation', owner: 'Prasanna Hegde', status: 'In Progress', completion: '97%', group: 'Consulting' },
-      { id: 'NA-85', name: 'BBMP DPR Development', owner: 'Munavar Sheik', status: 'Active', completion: '0%', group: 'Consulting' },
-      { id: 'NA-69', name: 'Ahmedabad Master Plan Development', owner: 'Munavar Sheik', status: 'Active', completion: '0%', group: 'Consulting' },
-      { id: 'NA-52', name: 'Meroz Khan - Anand Rao Circle', owner: 'Nirup Jayanth', status: 'In Progress', completion: '88%', group: 'Consulting' },
-      { id: 'NA-36', name: 'Hogenekal PMC work', owner: 'Munavar Sheik', status: 'In Progress', completion: '0%', group: 'Consulting' }
-    ]
+    projects: []
   },
-  "Digital Marketing": {
-    department: 'Digital Marketing',
-    projects: [
-      { id: 'NA-63', name: 'NRPL Marketing', owner: 'Dipti Amarnath', status: 'In Progress', completion: '33%', group: 'Digital Marketing' },
-      { id: 'NA-45', name: 'Dal Moro\'s Marketing', owner: 'Dipti Amarnath', status: 'In Progress', completion: '80%', group: 'Digital Marketing' },
-      { id: 'NA-43', name: 'Rainland_Isuzu', owner: 'Dipti Amarnath', status: 'In Progress', completion: '69%', group: 'Digital Marketing' },
-      { id: 'NA-42', name: 'National Group', owner: 'Dipti Amarnath', status: 'In Progress', completion: '64%', group: 'Digital Marketing' },
-      { id: 'NA-40', name: 'iSky Marketing', owner: 'Dipti Amarnath', status: 'In Progress', completion: '42%', group: 'Digital Marketing' }
-    ]
+  "Operations": {
+    department: 'Operations',
+    projects: []
   }
 };
 
@@ -106,6 +83,7 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [showAPITester, setShowAPITester] = useState(false);
+  const [showDataManager, setShowDataManager] = useState(false);
 
   const peopleData = {
     kpis: [
@@ -139,16 +117,16 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
 
   const projectData = {
     kpis: [
-      { label: "Active Projects", value: "89", desc: "Currently in progress", editable: true },
-      { label: "Completed Projects", value: "21", desc: "Successfully finished", editable: true },
-      { label: "Total Value", value: "₹628Cr+", desc: "Combined project value", editable: true },
-      { label: "Success Rate", value: "87%", desc: "Project completion rate", editable: true }
+      { label: "Active Projects", value: "0", desc: "Currently in progress", editable: true },
+      { label: "Completed Projects", value: "0", desc: "Successfully finished", editable: true },
+      { label: "Total Value", value: "₹0", desc: "Combined project value", editable: true },
+      { label: "Success Rate", value: "0%", desc: "Project completion rate", editable: true }
     ],
     departments: [
-      { name: "NIPL Infrastructure", count: "35 active projects", clickable: true },
-      { name: "Real Estate", count: "28 active projects", clickable: true },
-      { name: "Consulting", count: "15 active projects", clickable: true },
-      { name: "Digital Marketing", count: "11 active projects", clickable: true }
+      { name: "Infrastructure", count: "No active projects", clickable: false },
+      { name: "Development", count: "No active projects", clickable: false },
+      { name: "Consulting", count: "No active projects", clickable: false },
+      { name: "Operations", count: "No active projects", clickable: false }
     ]
   };
 
@@ -216,6 +194,21 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
     setEditMode(!editMode);
   };
 
+  const clearProjectData = () => {
+    // Reset selected department
+    setSelectedDepartment(null);
+    
+    // Close all panels
+    setShowAPITester(false);
+    setShowDataManager(false);
+    setEditMode(false);
+    
+    // Clear localStorage
+    localStorage.clear();
+    
+    alert('Project data cleared! Dashboard reset to clean state.');
+  };
+
   const getRoleInfo = () => {
     switch (user?.role) {
       case UserRole.VIEWER:
@@ -251,6 +244,14 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setShowDataManager(!showDataManager)}
+              className="border-red-300 text-red-800 hover:bg-red-50 shadow-lg backdrop-blur-sm"
+            >
+              🗑️ {showDataManager ? 'Hide' : 'Clear'} Data
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setShowAPITester(!showAPITester)}
               className="border-blue-300 text-blue-800 hover:bg-blue-50 shadow-lg backdrop-blur-sm"
             >
@@ -282,6 +283,21 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
             </p>
           </div>
           <ZohoAPITester />
+        </div>
+      )}
+
+      {/* Data Manager Section */}
+      {showDataManager && (
+        <div className="bg-gradient-to-r from-red-50/50 via-white to-pink-50/50 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-red-100/50">
+          <div className="mb-4">
+            <h3 className="text-2xl font-light bg-gradient-to-r from-red-700 via-pink-600 to-red-800 bg-clip-text text-transparent">
+              🗑️ Data Management Center
+            </h3>
+            <p className="text-red-600/80 text-sm font-light mt-1">
+              Clear application data and reset dashboard to initial state
+            </p>
+          </div>
+          <DataClearManager />
         </div>
       )}
 
