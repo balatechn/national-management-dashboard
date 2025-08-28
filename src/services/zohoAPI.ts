@@ -5,7 +5,7 @@ const ZOHO_CONFIG = {
   CLIENT_ID: import.meta.env.VITE_ZOHO_CLIENT_ID || '',
   CLIENT_SECRET: import.meta.env.VITE_ZOHO_CLIENT_SECRET || '',
   REDIRECT_URI: import.meta.env.VITE_ZOHO_REDIRECT_URI || 'http://localhost:3001/auth/callback',
-  SCOPES: 'ZohoPeople.employee.READ,ZohoPayroll.employees.READ,ZohoProjects.projects.READ,ZohoCRM.modules.READ',
+  SCOPES: 'ZohoPeople.forms.READ', // Start with the most basic scope
   PEOPLE_BASE_URL: 'https://people.zoho.com/people/api',
   PAYROLL_BASE_URL: 'https://payroll.zoho.com/api/v1',
   PROJECTS_BASE_URL: 'https://projectsapi.zoho.com/restapi',

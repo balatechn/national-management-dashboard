@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { zohoAPI, ZohoEmployee, ZohoPayrollData, ZohoProject, ZohoTask } from '../services/zohoAPI';
 import ZohoAPICodeExamples from './ZohoAPICodeExamples';
+import ZohoQuickFix from './ZohoQuickFix';
 import { 
   Users, DollarSign, FolderOpen, Calendar, 
   Download, RefreshCw, CheckCircle, XCircle, AlertCircle, Code 
@@ -214,22 +215,26 @@ const ZohoDataFetchDemo: React.FC<DataFetchDemoProps> = ({ onClose }) => {
 
   if (!isAuthenticated) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
-            Authentication Required
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 mb-4">
-            Please authenticate with Zoho first to fetch data.
-          </p>
-          <Button onClick={() => window.location.href = zohoAPI.getAuthorizationUrl()}>
-            Connect to Zoho
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <ZohoQuickFix />
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-500" />
+              Authentication Required
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 mb-4">
+              Please authenticate with Zoho first to fetch data.
+            </p>
+            <Button onClick={() => window.location.href = zohoAPI.getAuthorizationUrl()}>
+              Connect to Zoho
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
