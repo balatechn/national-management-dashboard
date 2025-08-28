@@ -241,6 +241,30 @@ const ZohoAPITester: React.FC = () => {
               🔐 Start OAuth Flow
             </Button>
           )}
+          
+          <Button 
+            onClick={() => {
+              // Refresh test results to check new auth status
+              runTests();
+            }}
+            variant="outline"
+            className="border-purple-300 text-purple-700 hover:bg-purple-50"
+          >
+            🔄 Refresh Status
+          </Button>
+
+          <Button 
+            onClick={() => {
+              // Clear stored tokens for testing
+              localStorage.removeItem('zoho_access_token');
+              localStorage.removeItem('zoho_refresh_token');
+              runTests();
+            }}
+            variant="outline"
+            className="border-red-300 text-red-700 hover:bg-red-50"
+          >
+            🗑️ Clear Tokens
+          </Button>
         </div>
 
         {/* Test Results */}

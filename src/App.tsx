@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./lib/authContext";
 import LoginPage from "./components/LoginPage";
 import EnhancedDashboard from "./components/EnhancedDashboard";
 import CSVUpload from "./components/CSVUpload";
+import AuthCallback from "./components/AuthCallback";
 import { Button } from "./components/ui/button";
 
 // Main Dashboard Component (requires authentication)
@@ -181,6 +183,12 @@ function DashboardContent() {
 // Main App Component with Authentication
 function AppContent() {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
+
+  // Handle OAuth callback route
+  if (location.pathname === '/auth/callback') {
+    return <AuthCallback />;
+  }
 
   if (isLoading) {
     return (
@@ -203,9 +211,11 @@ function AppContent() {
 // Root App Component with Authentication Provider
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
   );
 }
 
