@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { zohoAPI } from "@/services/zohoAPI";
+import ZohoScopeHelper from "./ZohoScopeHelper";
 import { CheckCircle, XCircle, AlertCircle, ExternalLink, Copy, RefreshCw } from "lucide-react";
 
 export default function ZohoSetupGuide() {
@@ -72,7 +73,76 @@ export default function ZohoSetupGuide() {
   };
 
   return (
-    <div className="space-y-6">
+            <div className="space-y-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-red-800 mb-2">⚠️ OAuth Scope Error Fix</h3>
+            <div className="text-red-700 space-y-2">
+              <p><strong>Error:</strong> "Invalid OAuth Scope - Scope does not exist"</p>
+              <p><strong>Solution:</strong> Configure the correct scopes in your Zoho API Console</p>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-blue-800 mb-3">🔧 Step 1: Fix Zoho API Console Scopes</h3>
+            <div className="space-y-3 text-blue-700">
+              <div>
+                <p className="font-medium">1. Go to Zoho API Console:</p>
+                <a 
+                  href="https://api-console.zoho.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800"
+                >
+                  https://api-console.zoho.com/
+                </a>
+              </div>
+              
+              <div>
+                <p className="font-medium">2. Select your application → Go to "Scopes" tab</p>
+              </div>
+              
+              <div>
+                <p className="font-medium">3. Add these scopes (start with minimal):</p>
+                <div className="bg-white p-3 rounded border mt-2">
+                  <p className="font-mono text-sm"><strong>Minimal (Start Here):</strong></p>
+                  <code className="block bg-gray-100 p-2 rounded mt-1 text-xs">ZohoPeople.forms.READ</code>
+                  
+                  <p className="font-mono text-sm mt-3"><strong>Basic (After minimal works):</strong></p>
+                  <code className="block bg-gray-100 p-2 rounded mt-1 text-xs">
+                    ZohoPeople.employee.READ<br/>
+                    ZohoPayroll.employees.READ
+                  </code>
+                  
+                  <p className="font-mono text-sm mt-3"><strong>Extended (Final goal):</strong></p>
+                  <code className="block bg-gray-100 p-2 rounded mt-1 text-xs">
+                    ZohoPeople.employee.READ<br/>
+                    ZohoPayroll.employees.READ<br/>
+                    ZohoProjects.projects.READ<br/>
+                    ZohoCRM.modules.READ
+                  </code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-green-800 mb-3">🎯 Step 2: Test Different Scope Modes</h3>
+            <div className="space-y-3 text-green-700">
+              <p>Add this to your <code>.env</code> file to test different scopes:</p>
+              <div className="bg-white p-3 rounded border">
+                <code className="block text-sm">
+                  # Start with minimal scope<br/>
+                  VITE_ZOHO_SCOPE_MODE=minimal<br/><br/>
+                  
+                  # After minimal works, try basic<br/>
+                  # VITE_ZOHO_SCOPE_MODE=basic<br/><br/>
+                  
+                  # After basic works, try extended<br/>
+                  # VITE_ZOHO_SCOPE_MODE=extended
+                </code>
+              </div>
+            </div>
+          </div>
       <Card className="border-amber-200">
         <CardHeader>
           <CardTitle className="text-amber-800 flex items-center">
@@ -231,6 +301,9 @@ export default function ZohoSetupGuide() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Scope Helper */}
+      <ZohoScopeHelper />
     </div>
   );
 }

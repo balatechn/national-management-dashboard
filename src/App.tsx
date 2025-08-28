@@ -4,13 +4,14 @@ import { AuthProvider, useAuth } from "./lib/authContext";
 import LoginPage from "./components/LoginPage";
 import ZohoIntegratedDashboard from "./components/ZohoIntegratedDashboard";
 import PayrollDashboard from "./components/PayrollDashboard";
+import ZohoDataFetchDemo from "./components/ZohoDataFetchDemo";
 import AuthCallback from "./components/AuthCallback";
 import { Button } from "./components/ui/button";
-import { Users, DollarSign, BarChart3, UserCheck, Home } from "lucide-react";
+import { Users, DollarSign, BarChart3, UserCheck, Home, Database } from "lucide-react";
 
 // Main Dashboard Component (requires authentication)
 function DashboardContent() {
-  const [activeTab, setActiveTab] = useState<"overview" | "people" | "payroll" | "project" | "crm" | "finance" | "setup">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "people" | "payroll" | "project" | "crm" | "finance" | "setup" | "demo">("overview");
   const { user, logout } = useAuth();
 
   const modules = [
@@ -19,7 +20,8 @@ function DashboardContent() {
     { id: "crm", label: "CRM", icon: Users },
     { id: "finance", label: "Finance", icon: DollarSign },
     { id: "people", label: "People & Payroll", icon: UserCheck },
-    { id: "setup", label: "Zoho Setup", icon: Users }
+    { id: "setup", label: "Zoho Setup", icon: Users },
+    { id: "demo", label: "Data Demo", icon: Database }
   ];
 
   const renderContent = () => {
@@ -38,6 +40,8 @@ function DashboardContent() {
         return <ZohoIntegratedDashboard module="finance" />;
       case "setup":
         return <ZohoIntegratedDashboard module="setup" />;
+      case "demo":
+        return <ZohoDataFetchDemo />;
       default:
         return <ZohoIntegratedDashboard module="overview" />;
     }

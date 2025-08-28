@@ -4,8 +4,8 @@ import axios from 'axios';
 const ZOHO_CONFIG = {
   CLIENT_ID: import.meta.env.VITE_ZOHO_CLIENT_ID || '',
   CLIENT_SECRET: import.meta.env.VITE_ZOHO_CLIENT_SECRET || '',
-  REDIRECT_URI: import.meta.env.VITE_ZOHO_REDIRECT_URI || 'http://localhost:3000/auth/callback',
-  SCOPES: 'ZohoPeople.employee.ALL,ZohoPayroll.employees.ALL,ZohoProjects.projects.ALL,ZohoCRM.modules.ALL',
+  REDIRECT_URI: import.meta.env.VITE_ZOHO_REDIRECT_URI || 'http://localhost:3001/auth/callback',
+  SCOPES: 'ZohoPeople.employee.READ,ZohoPayroll.employees.READ,ZohoProjects.projects.READ,ZohoCRM.modules.READ',
   PEOPLE_BASE_URL: 'https://people.zoho.com/people/api',
   PAYROLL_BASE_URL: 'https://payroll.zoho.com/api/v1',
   PROJECTS_BASE_URL: 'https://projectsapi.zoho.com/restapi',
@@ -130,12 +130,30 @@ class ZohoAPIService {
     this.refreshToken = localStorage.getItem('zoho_refresh_token');
   }
 
+  // Flexible scope configuration for testing
+  private getScopes(): string {
+    const scopeOptions = {
+      // Option 1: Very basic scopes (most likely to work)
+      minimal: 'ZohoPeople.forms.READ',
+      // Option 2: Basic read scopes
+      basic: 'ZohoPeople.employee.READ,ZohoPayroll.employees.READ',
+      // Option 3: Extended read scopes
+      extended: 'ZohoPeople.employee.READ,ZohoPayroll.employees.READ,ZohoProjects.projects.READ,ZohoCRM.modules.READ',
+      // Option 4: Full access (if configured in your console)
+      full: 'ZohoPeople.employee.ALL,ZohoPayroll.employees.ALL,ZohoProjects.projects.ALL,ZohoCRM.modules.ALL'
+    };
+
+    // Use environment variable to control scope mode, default to minimal for testing
+    const scopeMode = import.meta.env.VITE_ZOHO_SCOPE_MODE || 'minimal';
+    return scopeOptions[scopeMode as keyof typeof scopeOptions] || scopeOptions.minimal;
+  }
+
   // Step 1: Generate OAuth URL for user authorization
   getAuthorizationUrl(): string {
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: ZOHO_CONFIG.CLIENT_ID,
-      scope: ZOHO_CONFIG.SCOPES,
+      scope: this.getScopes(), // Use flexible scopes
       redirect_uri: ZOHO_CONFIG.REDIRECT_URI,
       access_type: 'offline',
     });
