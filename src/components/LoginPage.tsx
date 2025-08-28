@@ -94,16 +94,31 @@ const LoginPage: React.FC = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-md mx-auto">
-        {/* Header */}
+        {/* Enhanced Header with Logo */}
         <div className="text-center mb-12">
-          <img 
-            src="/national-logo.png" 
-            alt="National Group Logo" 
-            className="h-24 w-auto mx-auto mb-8 filter drop-shadow-xl"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
+          <div className="relative inline-block">
+            {/* Enhanced Logo with Background */}
+            <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border border-amber-200/50 inline-block mb-4">
+              <img 
+                src="/national-logo.png" 
+                alt="National Group Logo" 
+                className="h-28 w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              {/* Glow effect behind logo */}
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-yellow-400/30 rounded-3xl blur-2xl -z-10"></div>
+            </div>
+            
+            {/* Zoho Integration Badge */}
+            <div className="bg-gradient-to-r from-blue-500/90 to-indigo-600/90 backdrop-blur-lg px-4 py-2 rounded-full border border-blue-300/60 shadow-xl inline-block">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-white font-bold text-xs tracking-wider">🔗 ZOHO INTEGRATED</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Login Card */}

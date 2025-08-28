@@ -49,21 +49,47 @@ function DashboardContent() {
               <h1 className="text-6xl font-display font-bold text-white tracking-normal drop-shadow-2xl filter brightness-110 antialiased animate-fadeInUp">
                 Management Dashboard
               </h1>
-              <p className="text-amber-50 mt-4 font-serif font-medium text-xl tracking-wide drop-shadow-lg antialiased animate-fadeInUp animation-delay-200">
-                Advanced Business Intelligence & Analytics Platform
-              </p>
+              <div className="flex items-center space-x-4 mt-4">
+                <p className="text-amber-50 font-serif font-medium text-xl tracking-wide drop-shadow-lg antialiased animate-fadeInUp animation-delay-200">
+                  Advanced Business Intelligence & Analytics Platform
+                </p>
+                <div className="bg-gradient-to-r from-blue-500/80 to-indigo-600/80 px-4 py-2 rounded-full border border-blue-300/40 animate-fadeInUp animation-delay-300">
+                  <span className="text-white font-bold text-sm tracking-wider">⚡ Powered by Zoho</span>
+                </div>
+              </div>
             </div>
             
-            {/* Logo in top right */}
+            {/* Enhanced Logo and Zoho Integration */}
             <div className="flex items-center space-x-6">
-              <img 
-                src="/national-logo.png" 
-                alt="National Group Logo" 
-                className="h-14 w-auto object-contain filter drop-shadow-lg"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
+              {/* Enhanced Logo with Better Visibility */}
+              <div className="relative bg-white/95 backdrop-blur-lg rounded-2xl p-4 shadow-2xl border border-amber-200/50 hover:shadow-3xl transition-all duration-300 group">
+                <img 
+                  src="/national-logo.png" 
+                  alt="National Group Logo" 
+                  className="h-20 w-auto object-contain filter drop-shadow-xl group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 rounded-2xl blur-xl -z-10 group-hover:blur-2xl transition-all duration-300"></div>
+              </div>
+              
+              {/* Zoho Integration Badge */}
+              <div className="bg-gradient-to-r from-blue-500/90 to-indigo-600/90 backdrop-blur-lg px-5 py-3 rounded-2xl border border-blue-300/60 shadow-xl hover:shadow-2xl transition-all duration-300 group cursor-pointer">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    <div className="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
+                  </div>
+                  <div className="text-white">
+                    <div className="font-bold text-sm tracking-wider">🔗 ZOHO INTEGRATED</div>
+                    <div className="text-blue-100 text-xs font-medium">Real-time Data Sync</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* User Welcome */}
               <div className="bg-gradient-to-r from-amber-100/90 to-yellow-100/90 backdrop-blur-lg px-6 py-3 rounded-2xl border border-amber-200/60 shadow-xl">
                 <span className="text-amber-800 font-light text-lg tracking-wide">Welcome, </span>
                 <span className="text-amber-900 font-semibold text-lg tracking-wide bg-gradient-to-r from-amber-700 to-yellow-700 bg-clip-text text-transparent">{user?.username}</span>

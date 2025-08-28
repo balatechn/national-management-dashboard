@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useAuth, UserRole } from '../lib/authContext';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -103,9 +103,7 @@ interface DashboardProps {
 const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
   const { user, permissions, hasPermission } = useAuth();
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
-  const [uploadStatus, setUploadStatus] = useState<string>('');
   const [editMode, setEditMode] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const peopleData = {
     kpis: [
@@ -208,29 +206,6 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
     setSelectedDepartment(deptName);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!hasPermission('canUpload')) {
-      alert('You need Admin access to upload files.');
-      return;
-    }
-
-    if (!file.name.endsWith('.csv')) {
-      setUploadStatus('Error: Please upload a CSV file only.');
-      return;
-    }
-
-    setUploadStatus('Uploading...');
-    
-    // Simulate file upload
-    setTimeout(() => {
-      setUploadStatus(`Success: ${file.name} uploaded successfully!`);
-      setTimeout(() => setUploadStatus(''), 3000);
-    }, 2000);
-  };
-
   const handleEdit = () => {
     if (!hasPermission('canEdit')) {
       alert('You need Admin access to edit dashboard data.');
@@ -284,45 +259,6 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
           </div>
         </div>
       </div>
-
-      {/* File Upload Section - Only for Admin */}
-      {hasPermission('canUpload') && (
-        <Card className="bg-gradient-to-r from-white to-amber-50 border-amber-300 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-xl font-extralight bg-gradient-to-r from-amber-700 via-yellow-600 to-orange-700 bg-clip-text text-transparent tracking-wide">CSV File Upload</CardTitle>
-            <CardDescription className="text-amber-700">Upload CSV files to update dashboard data</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-4">
-              <Input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv"
-                onChange={handleFileUpload}
-                className="max-w-xs border-amber-300 focus:border-amber-500"
-              />
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="border-amber-400 text-amber-800 hover:bg-amber-50"
-              >
-                Choose CSV File
-              </Button>
-            </div>
-            {uploadStatus && (
-              <div className={`mt-3 p-3 rounded-md text-sm ${
-                uploadStatus.includes('Error') 
-                  ? 'bg-red-50 text-red-700 border border-red-200' 
-                  : uploadStatus.includes('Success')
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-amber-50 text-amber-700 border border-amber-200'
-              }`}>
-                {uploadStatus}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       {/* Elegant KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
