@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import ProjectTable from './ProjectTable';
+import ZohoAPITester from './ZohoAPITester';
 
 interface DrillDownData {
   department: string;
@@ -104,6 +105,7 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
   const { user, permissions, hasPermission } = useAuth();
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [showAPITester, setShowAPITester] = useState(false);
 
   const peopleData = {
     kpis: [
@@ -246,6 +248,14 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
             <div className={`px-6 py-3 rounded-xl text-sm font-medium border-2 shadow-lg backdrop-blur-sm ${roleInfo.color}`}>
               {roleInfo.label} Access
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAPITester(!showAPITester)}
+              className="border-blue-300 text-blue-800 hover:bg-blue-50 shadow-lg backdrop-blur-sm"
+            >
+              🔧 {showAPITester ? 'Hide' : 'API'} Tester
+            </Button>
             {hasPermission('canEdit') && (
               <Button
                 variant={editMode ? "destructive" : "outline"}
@@ -259,6 +269,21 @@ const EnhancedDashboard: React.FC<DashboardProps> = ({ title, type }) => {
           </div>
         </div>
       </div>
+
+      {/* API Tester Section */}
+      {showAPITester && (
+        <div className="bg-gradient-to-r from-blue-50/50 via-white to-cyan-50/50 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-blue-100/50">
+          <div className="mb-4">
+            <h3 className="text-2xl font-light bg-gradient-to-r from-blue-700 via-cyan-600 to-blue-800 bg-clip-text text-transparent">
+              🔧 Zoho API Integration Tester
+            </h3>
+            <p className="text-blue-600/80 text-sm font-light mt-1">
+              Test and validate your Zoho API connection and authentication
+            </p>
+          </div>
+          <ZohoAPITester />
+        </div>
+      )}
 
       {/* Elegant KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
