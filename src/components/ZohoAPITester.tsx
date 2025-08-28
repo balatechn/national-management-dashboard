@@ -14,6 +14,7 @@ const ZohoAPITester: React.FC = () => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [authUrl, setAuthUrl] = useState<string>('');
+  const [testMode, setTestMode] = useState(false);
 
   // Initialize tests
   const initializeTests = () => {
@@ -76,19 +77,34 @@ const ZohoAPITester: React.FC = () => {
   // Test authentication status
   const testAuthStatus = async () => {
     try {
-      const isAuth = zohoAPI.isAuthenticated();
-      const token = localStorage.getItem('zoho_access_token');
-      const refreshToken = localStorage.getItem('zoho_refresh_token');
+      if (testMode) {
+        // Test mode: simulate authentication
+        updateTestResult('🔍 Authentication Status', 'success', 
+          'Test Mode: Simulated authentication successful', 
+          { 
+            authenticated: true,
+            hasAccessToken: true,
+            hasRefreshToken: true,
+            testMode: true
+          }
+        );
+        return true;
+      } else {
+        // Real authentication check
+        const isAuth = zohoAPI.isAuthenticated();
+        const token = localStorage.getItem('zoho_access_token');
+        const refreshToken = localStorage.getItem('zoho_refresh_token');
 
-      updateTestResult('🔍 Authentication Status', isAuth ? 'success' : 'error', 
-        isAuth ? 'User is authenticated' : 'User not authenticated', 
-        { 
-          authenticated: isAuth,
-          hasAccessToken: !!token,
-          hasRefreshToken: !!refreshToken
-        }
-      );
-      return isAuth;
+        updateTestResult('🔍 Authentication Status', isAuth ? 'success' : 'error', 
+          isAuth ? 'User is authenticated' : 'User not authenticated', 
+          { 
+            authenticated: isAuth,
+            hasAccessToken: !!token,
+            hasRefreshToken: !!refreshToken
+          }
+        );
+        return isAuth;
+      }
     } catch (error) {
       updateTestResult('🔍 Authentication Status', 'error', `Error: ${error}`);
       return false;
@@ -98,16 +114,27 @@ const ZohoAPITester: React.FC = () => {
   // Test API connection (this will fail until OAuth is complete)
   const testAPIConnection = async () => {
     try {
-      // This will only work if user is authenticated
-      if (!zohoAPI.isAuthenticated()) {
-        updateTestResult('🔗 API Connection Test', 'error', 'Cannot test API - user not authenticated');
-        return false;
-      }
+      if (testMode) {
+        // Test mode: simulate API connection
+        const mockData = {
+          peopleAPI: { connected: true, employeesCount: 142 },
+          payrollAPI: { connected: true, recordsCount: 89 },
+          projectsAPI: { connected: true, projectsCount: 25 }
+        };
+        updateTestResult('🔗 API Connection Test', 'success', 'Test Mode: All APIs connected successfully', mockData);
+        return true;
+      } else {
+        // Real API connection test
+        if (!zohoAPI.isAuthenticated()) {
+          updateTestResult('🔗 API Connection Test', 'error', 'Cannot test API - user not authenticated');
+          return false;
+        }
 
-      // Try to fetch employees (this will trigger authentication flow)
-      const employees = await zohoAPI.getEmployees();
-      updateTestResult('🔗 API Connection Test', 'success', `Successfully connected! Found ${employees.length} employees`, { count: employees.length });
-      return true;
+        // Try to fetch employees (this will trigger authentication flow)
+        const employees = await zohoAPI.getEmployees();
+        updateTestResult('🔗 API Connection Test', 'success', `Successfully connected! Found ${employees.length} employees`, { count: employees.length });
+        return true;
+      }
     } catch (error: any) {
       if (error.message?.includes('No access token')) {
         updateTestResult('🔗 API Connection Test', 'error', 'No access token - OAuth flow required');
@@ -195,6 +222,21 @@ const ZohoAPITester: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Test Mode Banner */}
+        {testMode && (
+          <div className="bg-purple-100 border border-purple-300 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-xl">🧪</span>
+              <div>
+                <h3 className="font-semibold text-purple-800">Test Mode Active</h3>
+                <p className="text-sm text-purple-700">
+                  OAuth authentication is bypassed. API calls will return mock data.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* API Configuration Display */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-800 mb-2">🔧 Current API Configuration</h3>
@@ -224,6 +266,14 @@ const ZohoAPITester: React.FC = () => {
 
         {/* Test Controls */}
         <div className="flex space-x-4">
+          <Button 
+            onClick={() => setTestMode(!testMode)}
+            variant={testMode ? "default" : "outline"}
+            className={testMode ? "bg-purple-600 hover:bg-purple-700 text-white" : "border-purple-300 text-purple-700 hover:bg-purple-50"}
+          >
+            🧪 {testMode ? 'Exit Test Mode' : 'Test Mode'}
+          </Button>
+
           <Button 
             onClick={runTests}
             disabled={isRunning}
@@ -296,14 +346,27 @@ const ZohoAPITester: React.FC = () => {
 
         {/* Next Steps Guide */}
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <h3 className="font-semibold text-amber-800 mb-2">📋 Testing Steps</h3>
-          <ol className="list-decimal list-inside text-sm text-amber-700 space-y-1">
-            <li>Click "Run Tests" to check your configuration</li>
-            <li>If environment variables test passes, click "Start OAuth Flow"</li>
-            <li>Complete OAuth authorization in the popup window</li>
-            <li>Return here to see API connection results</li>
-            <li>Once authenticated, you can test API calls</li>
-          </ol>
+          <h3 className="font-semibold text-amber-800 mb-2">📋 Testing Options</h3>
+          <div className="space-y-3">
+            <div>
+              <h4 className="font-medium text-amber-700">🧪 Test Mode (No OAuth Required)</h4>
+              <ol className="list-decimal list-inside text-sm text-amber-700 space-y-1 ml-4">
+                <li>Click "🧪 Test Mode" to enable simulation mode</li>
+                <li>Click "🚀 Run Tests" to see simulated results</li>
+                <li>All tests will pass with mock data</li>
+              </ol>
+            </div>
+            <div>
+              <h4 className="font-medium text-amber-700">🔐 Real OAuth Flow</h4>
+              <ol className="list-decimal list-inside text-sm text-amber-700 space-y-1 ml-4">
+                <li>Ensure Test Mode is OFF</li>
+                <li>Click "🚀 Run Tests" to check configuration</li>
+                <li>If environment variables pass, click "Start OAuth Flow"</li>
+                <li>Complete OAuth authorization in popup window</li>
+                <li>Return here to see real API connection results</li>
+              </ol>
+            </div>
+          </div>
         </div>
 
         {/* Troubleshooting */}
