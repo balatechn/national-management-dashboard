@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   BarChart,
@@ -104,6 +104,7 @@ const StatCard = ({ icon: Icon, title, value, desc, trend }: any) => (
 export default function ZohoPeopleDashboard() {
   const [employees, setEmployees] = useState<ZohoEmployee[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setIsAuthenticated(zohoAPI.isAuthenticated());
@@ -113,12 +114,15 @@ export default function ZohoPeopleDashboard() {
   }, []);
 
   const loadEmployeeData = async () => {
+    setLoading(true);
     try {
       const employeeData = await zohoAPI.getEmployees();
       setEmployees(employeeData);
     } catch (error) {
       console.error('Error loading employee data:', error);
       // Fall back to mock data for demo
+    } finally {
+      setLoading(false);
     }
   };
 

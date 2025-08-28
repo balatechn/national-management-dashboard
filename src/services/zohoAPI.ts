@@ -2,17 +2,15 @@ import axios from 'axios';
 
 // Zoho API Configuration
 const ZOHO_CONFIG = {
-  CLIENT_ID: import.meta.env.VITE_ZOHO_CLIENT_ID || '',
-  CLIENT_SECRET: import.meta.env.VITE_ZOHO_CLIENT_SECRET || '',
-  REDIRECT_URI: import.meta.env.VITE_ZOHO_REDIRECT_URI || 'http://localhost:3001/auth/callback',
-  SCOPES: 'ZohoPeople.forms.READ', // Start with the most basic scope
-  PEOPLE_BASE_URL: 'https://people.zoho.com/people/api',
+  CLIENT_ID: process.env.VITE_ZOHO_CLIENT_ID || '',
+  CLIENT_SECRET: process.env.VITE_ZOHO_CLIENT_SECRET || '',
+  REDIRECT_URI: process.env.VITE_ZOHO_REDIRECT_URI || 'http://localhost:3000/auth/callback',
+  SCOPES: 'ZohoPeople.employee.ALL,ZohoPayroll.employees.ALL,ZohoProjects.projects.ALL',
+  BASE_URL: 'https://people.zoho.com/people/api',
   PAYROLL_BASE_URL: 'https://payroll.zoho.com/api/v1',
-  PROJECTS_BASE_URL: 'https://projectsapi.zoho.com/restapi',
-  CRM_BASE_URL: 'https://www.zohoapis.com/crm/v2',
+  PROJECTS_BASE_URL: 'https://projects.zoho.com/restapi',
 };
 
-// Interfaces for different Zoho modules
 export interface ZohoEmployee {
   employeeId: string;
   firstName: string;
@@ -48,76 +46,15 @@ export interface ZohoPayrollData {
 }
 
 export interface ZohoProject {
-  id: string;
+  id_string: string;
   name: string;
-  description: string;
   status: string;
-  startDate: string;
-  endDate: string;
-  budget: number;
-  spent: number;
-  owner: string;
-  team: string[];
-  progress: number;
-  priority: 'High' | 'Medium' | 'Low';
-  client?: string;
-}
-
-export interface ZohoTask {
-  id: string;
-  name: string;
-  description: string;
-  projectId: string;
-  assignee: string;
-  status: 'Open' | 'InProgress' | 'Completed' | 'Closed';
-  priority: 'High' | 'Medium' | 'Low';
-  startDate: string;
-  dueDate: string;
-  progress: number;
-  estimatedHours: number;
-  actualHours: number;
-}
-
-export interface ZohoCRMContact {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  company: string;
-  designation: string;
-  leadSource: string;
-  stage: string;
-  value: number;
-  createdDate: string;
-  modifiedDate: string;
-  owner: string;
-}
-
-export interface ZohoCRMDeal {
-  id: string;
-  dealName: string;
-  contactName: string;
-  accountName: string;
-  stage: string;
-  amount: number;
-  closingDate: string;
-  probability: number;
-  leadSource: string;
-  owner: string;
-  description: string;
-  createdDate: string;
-}
-
-export interface ZohoTimesheet {
-  id: string;
-  employeeId: string;
-  projectId: string;
-  taskId: string;
-  date: string;
-  hours: number;
-  description: string;
-  billable: boolean;
+  created_date: string;
+  owner_name: string;
+  bug_count: {
+    open: number;
+    closed: number;
+  };
 }
 
 class ZohoAPIService {
@@ -130,30 +67,12 @@ class ZohoAPIService {
     this.refreshToken = localStorage.getItem('zoho_refresh_token');
   }
 
-  // Flexible scope configuration for testing
-  private getScopes(): string {
-    const scopeOptions = {
-      // Option 1: Very basic scopes (most likely to work)
-      minimal: 'ZohoPeople.forms.READ',
-      // Option 2: Basic read scopes
-      basic: 'ZohoPeople.employee.READ,ZohoPayroll.employees.READ',
-      // Option 3: Extended read scopes
-      extended: 'ZohoPeople.employee.READ,ZohoPayroll.employees.READ,ZohoProjects.projects.READ,ZohoCRM.modules.READ',
-      // Option 4: Full access (if configured in your console)
-      full: 'ZohoPeople.employee.ALL,ZohoPayroll.employees.ALL,ZohoProjects.projects.ALL,ZohoCRM.modules.ALL'
-    };
-
-    // Use environment variable to control scope mode, default to minimal for testing
-    const scopeMode = import.meta.env.VITE_ZOHO_SCOPE_MODE || 'minimal';
-    return scopeOptions[scopeMode as keyof typeof scopeOptions] || scopeOptions.minimal;
-  }
-
   // Step 1: Generate OAuth URL for user authorization
   getAuthorizationUrl(): string {
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: ZOHO_CONFIG.CLIENT_ID,
-      scope: this.getScopes(), // Use flexible scopes
+      scope: ZOHO_CONFIG.SCOPES,
       redirect_uri: ZOHO_CONFIG.REDIRECT_URI,
       access_type: 'offline',
     });
@@ -248,13 +167,13 @@ class ZohoAPIService {
 
   // Fetch all employees from Zoho People
   async getEmployees(): Promise<ZohoEmployee[]> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PEOPLE_BASE_URL}/forms/employee/records`);
+    const data = await this.makeRequest(`${ZOHO_CONFIG.BASE_URL}/forms/employee/records`);
     return data.response.result || [];
   }
 
   // Fetch employee details by ID
   async getEmployeeById(employeeId: string): Promise<ZohoEmployee> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PEOPLE_BASE_URL}/forms/employee/records/${employeeId}`);
+    const data = await this.makeRequest(`${ZOHO_CONFIG.BASE_URL}/forms/employee/records/${employeeId}`);
     return data.response.result;
   }
 
@@ -271,7 +190,7 @@ class ZohoAPIService {
 
   // Fetch attendance data
   async getAttendanceData(employeeId?: string, from?: string, to?: string) {
-    let url = `${ZOHO_CONFIG.PEOPLE_BASE_URL}/attendance/getAttendanceEntries`;
+    let url = `${ZOHO_CONFIG.BASE_URL}/attendance/getAttendanceEntries`;
     const params = new URLSearchParams();
     
     if (employeeId) params.append('empId', employeeId);
@@ -286,213 +205,6 @@ class ZohoAPIService {
     return data.response.result || [];
   }
 
-  // === ZOHO PROJECTS API METHODS ===
-  
-  // Fetch all projects
-  async getProjects(): Promise<ZohoProject[]> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/projects`);
-    return data.projects || [];
-  }
-
-  // Fetch project details by ID
-  async getProjectById(projectId: string): Promise<ZohoProject> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/projects/${projectId}`);
-    return data.project;
-  }
-
-  // Fetch tasks for a project
-  async getProjectTasks(projectId: string): Promise<ZohoTask[]> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/projects/${projectId}/tasks`);
-    return data.tasks || [];
-  }
-
-  // Create a new project
-  async createProject(projectData: Partial<ZohoProject>): Promise<ZohoProject> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/projects`, {
-      method: 'POST',
-      data: projectData
-    });
-    return data.project;
-  }
-
-  // Update project
-  async updateProject(projectId: string, projectData: Partial<ZohoProject>): Promise<ZohoProject> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/projects/${projectId}`, {
-      method: 'PUT',
-      data: projectData
-    });
-    return data.project;
-  }
-
-  // Fetch project timesheets
-  async getProjectTimesheets(projectId: string, from?: string, to?: string): Promise<ZohoTimesheet[]> {
-    let url = `${ZOHO_CONFIG.PROJECTS_BASE_URL}/projects/${projectId}/logs`;
-    const params = new URLSearchParams();
-    
-    if (from) params.append('from_date', from);
-    if (to) params.append('to_date', to);
-    
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
-
-    const data = await this.makeRequest(url);
-    return data.timelogs || [];
-  }
-
-  // === ZOHO CRM API METHODS ===
-  
-  // Fetch all contacts
-  async getCRMContacts(page: number = 1, perPage: number = 200): Promise<ZohoCRMContact[]> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Contacts?page=${page}&per_page=${perPage}`);
-    return data.data || [];
-  }
-
-  // Fetch all deals
-  async getCRMDeals(page: number = 1, perPage: number = 200): Promise<ZohoCRMDeal[]> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Deals?page=${page}&per_page=${perPage}`);
-    return data.data || [];
-  }
-
-  // Fetch contact by ID
-  async getCRMContactById(contactId: string): Promise<ZohoCRMContact> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Contacts/${contactId}`);
-    return data.data[0];
-  }
-
-  // Fetch deal by ID
-  async getCRMDealById(dealId: string): Promise<ZohoCRMDeal> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Deals/${dealId}`);
-    return data.data[0];
-  }
-
-  // Create new contact
-  async createCRMContact(contactData: Partial<ZohoCRMContact>): Promise<ZohoCRMContact> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Contacts`, {
-      method: 'POST',
-      data: { data: [contactData] }
-    });
-    return data.data[0];
-  }
-
-  // Create new deal
-  async createCRMDeal(dealData: Partial<ZohoCRMDeal>): Promise<ZohoCRMDeal> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Deals`, {
-      method: 'POST',
-      data: { data: [dealData] }
-    });
-    return data.data[0];
-  }
-
-  // Update contact
-  async updateCRMContact(contactId: string, contactData: Partial<ZohoCRMContact>): Promise<ZohoCRMContact> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Contacts/${contactId}`, {
-      method: 'PUT',
-      data: { data: [contactData] }
-    });
-    return data.data[0];
-  }
-
-  // Update deal
-  async updateCRMDeal(dealId: string, dealData: Partial<ZohoCRMDeal>): Promise<ZohoCRMDeal> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.CRM_BASE_URL}/Deals/${dealId}`, {
-      method: 'PUT',
-      data: { data: [dealData] }
-    });
-    return data.data[0];
-  }
-
-  // === ZOHO PAYROLL ENHANCED METHODS ===
-  
-  // Get payroll summary for all employees
-  async getPayrollSummary(payPeriod?: string): Promise<any> {
-    let url = `${ZOHO_CONFIG.PAYROLL_BASE_URL}/payslips`;
-    if (payPeriod) {
-      url += `?pay_period=${payPeriod}`;
-    }
-    
-    const data = await this.makeRequest(url);
-    return data;
-  }
-
-  // Get employee salary details
-  async getEmployeeSalaryDetails(employeeId: string): Promise<any> {
-    const data = await this.makeRequest(`${ZOHO_CONFIG.PAYROLL_BASE_URL}/employees/${employeeId}/salary`);
-    return data;
-  }
-
-  // Get leave details for an employee
-  async getEmployeeLeaves(employeeId: string, year?: number): Promise<any> {
-    let url = `${ZOHO_CONFIG.PEOPLE_BASE_URL}/forms/leave/records`;
-    if (employeeId) {
-      url += `?employee_id=${employeeId}`;
-      if (year) {
-        url += `&year=${year}`;
-      }
-    }
-    
-    const data = await this.makeRequest(url);
-    return data.response.result || [];
-  }
-
-  // === ANALYTICS AND REPORTING METHODS ===
-  
-  // Get project analytics
-  async getProjectAnalytics(): Promise<any> {
-    const projects = await this.getProjects();
-    const analytics = {
-      totalProjects: projects.length,
-      activeProjects: projects.filter(p => p.status === 'Active').length,
-      completedProjects: projects.filter(p => p.status === 'Completed').length,
-      totalBudget: projects.reduce((sum, p) => sum + (p.budget || 0), 0),
-      totalSpent: projects.reduce((sum, p) => sum + (p.spent || 0), 0),
-      projectsByStatus: projects.reduce((acc: any, p) => {
-        acc[p.status] = (acc[p.status] || 0) + 1;
-        return acc;
-      }, {})
-    };
-    return analytics;
-  }
-
-  // Get CRM analytics
-  async getCRMAnalytics(): Promise<any> {
-    const [contacts, deals] = await Promise.all([
-      this.getCRMContacts(),
-      this.getCRMDeals()
-    ]);
-
-    const analytics = {
-      totalContacts: contacts.length,
-      totalDeals: deals.length,
-      totalDealValue: deals.reduce((sum, d) => sum + (d.amount || 0), 0),
-      dealsByStage: deals.reduce((acc: any, d) => {
-        acc[d.stage] = (acc[d.stage] || 0) + 1;
-        return acc;
-      }, {}),
-      averageDealValue: deals.length > 0 ? deals.reduce((sum, d) => sum + (d.amount || 0), 0) / deals.length : 0
-    };
-    return analytics;
-  }
-
-  // Get HR analytics
-  async getHRAnalytics(): Promise<any> {
-    const employees = await this.getEmployees();
-    
-    const analytics = {
-      totalEmployees: employees.length,
-      departmentWise: employees.reduce((acc: any, emp) => {
-        acc[emp.department] = (acc[emp.department] || 0) + 1;
-        return acc;
-      }, {}),
-      locationWise: employees.reduce((acc: any, emp) => {
-        acc[emp.location] = (acc[emp.location] || 0) + 1;
-        return acc;
-      }, {}),
-      activeEmployees: employees.filter(emp => emp.employeeStatus === 'Active').length
-    };
-    return analytics;
-  }
-
   // Check if user is authenticated
   isAuthenticated(): boolean {
     return !!this.accessToken;
@@ -504,6 +216,53 @@ class ZohoAPIService {
     this.refreshToken = null;
     localStorage.removeItem('zoho_access_token');
     localStorage.removeItem('zoho_refresh_token');
+    sessionStorage.removeItem('zoho_portal_id');
+  }
+
+  // Helper to get portal ID for Zoho Projects
+  private async getPortalId(): Promise<string | null> {
+    const cachedPortalId = sessionStorage.getItem('zoho_portal_id');
+    if (cachedPortalId) {
+      return cachedPortalId;
+    }
+
+    try {
+      const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/portals/`);
+      if (data.portals && data.portals.length > 0) {
+        const portalId = data.portals[0].id_string;
+        sessionStorage.setItem('zoho_portal_id', portalId);
+        return portalId;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching Zoho Projects portal ID:', error);
+      throw error;
+    }
+  }
+
+  // Fetch all projects from Zoho Projects
+  async getProjects(): Promise<ZohoProject[]> {
+    const portalId = await this.getPortalId();
+    if (!portalId) {
+      console.error("Zoho Projects portal ID not found.");
+      return [];
+    }
+    const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/portal/${portalId}/projects/`);
+    return data.projects || [];
+  }
+
+  // Fetch project details by ID
+  async getProjectById(projectId: string): Promise<ZohoProject | null> {
+    const portalId = await this.getPortalId();
+    if (!portalId) {
+      console.error("Zoho Projects portal ID not found.");
+      return null;
+    }
+    const data = await this.makeRequest(`${ZOHO_CONFIG.PROJECTS_BASE_URL}/portal/${portalId}/projects/${projectId}/`);
+    if (data.projects && data.projects.length > 0) {
+      return data.projects[0];
+    }
+    return null;
   }
 }
 

@@ -1,162 +1,218 @@
-# National Management Dashboard
+# MY Management - Zoho People & Payroll Dashboard
 
-A modern, elegant business intelligence platform built with React, TypeScript, and Tailwind CSS.
+A standalone web application that integrates with Zoho People and Zoho Payroll APIs to provide comprehensive HR and payroll analytics for MY Management.
 
-## ✨ Features
+## Features
 
-- **🔐 Role-Based Authentication**: Three-tier access system (Viewer, Interactive, Admin)
-- **📊 Multi-Module Dashboard**: People & Payroll, Project Management, CRM, Finance
-- **🎨 Elegant Design**: Modern dark theme with glassmorphism effects
-- **📱 Responsive**: Works seamlessly on all devices
-- **🚀 Real-Time Data**: Live project data integration
-- **🔍 Advanced Analytics**: Interactive charts and drill-down capabilities
+### Zoho People Dashboard
+- **Employee Analytics**: Total employees, active count, new joiners, department-wise distribution
+- **Attendance Tracking**: Daily attendance trends, leave management, location-wise stats
+- **Performance Monitoring**: Alerts for attendance issues, performance reviews, training completion
+- **Quick Actions**: Add employees, manage leaves, generate reports, view org chart
 
-## 🛠️ Tech Stack
+### Zoho Payroll Dashboard
+- **Payroll Overview**: Gross pay, net pay, deductions breakdown, headcount analytics
+- **Department Analysis**: Net pay distribution across cost centers
+- **Disbursement Tracking**: Bank transfer status, UTR reconciliation, branch-wise payments
+- **Compliance Alerts**: PF, ESI, TDS filing reminders with severity levels
+- **Payslip Management**: Generation progress, payroll locking, attendance sync
 
-- **Frontend**: React 18.2.0 + TypeScript
-- **Styling**: Tailwind CSS 3.3.3
-- **Build Tool**: Vite 4.4.5
-- **UI Components**: Custom shadcn/ui components
-- **Authentication**: Context-based auth with localStorage
+## Technology Stack
 
-## 🚀 Quick Start
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS + Custom UI Components
+- **Charts**: Recharts for data visualization
+- **Animation**: Framer Motion for smooth transitions
+- **API Integration**: Axios for HTTP requests
+- **Authentication**: Zoho OAuth 2.0
 
-### Prerequisites
-- Node.js 16+ 
-- npm or yarn
+## Prerequisites
 
-### Installation
+Before running this application, you need:
 
-1. Clone the repository:
+1. **Zoho Developer Account**: Sign up at [Zoho Developer Console](https://accounts.zoho.com/developerconsole)
+2. **Zoho People/Payroll Subscription**: Active subscription with API access
+3. **Node.js**: Version 18 or higher
+4. **npm/yarn**: Package manager
+
+## Quick Start
+
+### 1. Clone and Install
+
 ```bash
-git clone https://github.com/balatechn/national-management-dashboard.git
-cd national-management-dashboard
-```
+# Navigate to project directory
+cd People
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
 ```
 
-3. Start the development server:
+### 2. Configure Environment
+
 ```bash
+# Copy example environment file
+cp .env.example .env
+
+# Edit .env with your Zoho credentials
+# VITE_ZOHO_CLIENT_ID=your_client_id
+# VITE_ZOHO_CLIENT_SECRET=your_client_secret
+# VITE_ZOHO_REDIRECT_URI=http://localhost:3000/auth/callback
+```
+
+### 3. Set Up Zoho OAuth App
+
+1. Go to [Zoho Developer Console](https://accounts.zoho.com/developerconsole)
+2. Create a new **Server-based Application**
+3. Set the following:
+   - **Authorized Redirect URI**: `http://localhost:3000/auth/callback`
+   - **Scopes**: `ZohoPeople.employee.ALL,ZohoPayroll.employees.ALL`
+4. Copy the **Client ID** and **Client Secret** to your `.env` file
+
+### 4. Run the Application
+
+```bash
+# Start development server
 npm run dev
+
+# The app will open at http://localhost:3000
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+## API Integration Setup
 
-## 🔑 Demo Access
+### Zoho People API
 
-The dashboard includes demo accounts for testing:
+To fetch real employee data, you need:
 
-- **Viewer Access**: Read-only dashboard
-- **Manager Access**: Interactive analytics with drill-down
-- **Admin Access**: Full control panel with data management
+1. **API Access**: Ensure your Zoho People plan includes API access
+2. **Permissions**: Admin access to employee records
+3. **Rate Limits**: Be aware of API rate limits (typically 100 requests/minute)
 
-## 🏗️ Project Structure
+### Zoho Payroll API
 
+For payroll data integration:
+
+1. **Payroll Subscription**: Active Zoho Payroll subscription
+2. **API Permissions**: Access to employee payslips and payroll data
+3. **Organization ID**: Required for multi-org accounts
+
+### Authentication Flow
+
+1. **Authorization**: User clicks "Connect Zoho" → redirected to Zoho OAuth
+2. **Code Exchange**: Authorization code exchanged for access token
+3. **API Calls**: Authenticated requests to Zoho APIs
+4. **Token Refresh**: Automatic refresh of expired tokens
+
+## Deployment
+
+### Build for Production
+
+```bash
+# Create production build
+npm run build
+
+# The built files will be in the 'dist' directory
 ```
-src/
-├── components/          # React components
-│   ├── ui/             # Reusable UI components
-│   ├── LoginPage.tsx   # Authentication interface
-│   ├── EnhancedDashboard.tsx  # Main dashboard
-│   └── ProjectTable.tsx       # Project management table
-├── lib/                # Utilities and contexts
-│   ├── authContext.tsx # Authentication logic
-│   └── utils.ts        # Helper functions
-├── services/           # API services
-│   └── zohoAPI.ts      # External integrations
-└── styles/             # Global styles
+
+### Deploy Options
+
+#### 1. Vercel (Recommended)
+```bash
+npm install -g vercel
+vercel --prod
 ```
 
-## 📊 Dashboard Modules
-
-### 1. Project Management
-- Real-time project tracking
-- Completion percentages
-- Status indicators
-- Team assignments
-
-### 2. People & Payroll
-- Employee management
-- Department analytics
-- Payroll processing
-- Performance metrics
-
-### 3. CRM
-- Lead pipeline management
-- Customer analytics
-- Sales tracking
-- Conversion metrics
-
-### 4. Finance
-- Financial overview
-- Budget tracking
-- Revenue analytics
-- Cost analysis
-
-## 🎨 Design Features
-
-- **Dark Theme**: Modern slate/purple gradient background
-- **Glassmorphism**: Subtle transparency and blur effects
-- **Animations**: Smooth transitions and hover effects
-- **Typography**: Clean, readable fonts with proper hierarchy
-- **Color Palette**: Professional amber/gold accent colors
-
-## 🔒 Security
-
-- Role-based access control
-- Secure authentication flow
-- Permission-based UI rendering
-- Data validation and sanitization
-
-## 📈 Performance
-
-- Optimized bundle size with Vite
-- Lazy loading for better performance
-- Efficient state management
-- Responsive image handling
-
-## 🌐 Deployment
-
-### Netlify Deployment
-
-1. Build the project:
+#### 2. Netlify
 ```bash
 npm run build
+# Drag and drop 'dist' folder to Netlify
 ```
 
-2. Deploy to Netlify:
-   - Connect your GitHub repository
-   - Set build command: `npm run build`
-   - Set publish directory: `dist`
+#### 3. Traditional Hosting
+```bash
+npm run build
+# Upload 'dist' folder contents to your web server
+```
 
-## 📄 License
+## Configuration
 
-This project is licensed under the MIT License.
+### Environment Variables
 
-## 🤝 Contributing
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_ZOHO_CLIENT_ID` | Zoho OAuth Client ID | Yes |
+| `VITE_ZOHO_CLIENT_SECRET` | Zoho OAuth Client Secret | Yes |
+| `VITE_ZOHO_REDIRECT_URI` | OAuth Redirect URI | Yes |
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Customization
 
-## 📧 Contact
+#### 1. Company Branding
+- Update `index.html` title and favicon
+- Modify header text in `App.tsx`
+- Customize color scheme in `tailwind.config.js`
 
-**National Group India**
-- Website: [National Group](https://nationalgroup.in)
-- Email: info@nationalgroup.in
+#### 2. Data Sources
+- Replace mock data in components with real API calls
+- Adjust API endpoints in `src/services/zohoAPI.ts`
+- Configure data refresh intervals
 
-## 🙏 Acknowledgments
+#### 3. Dashboard Layout
+- Modify card arrangements in dashboard components
+- Add/remove KPI metrics
+- Customize chart types and configurations
 
-- React Team for the amazing framework
-- Tailwind CSS for the utility-first styling
-- Vite for the blazing fast build tool
-- shadcn/ui for the beautiful components
+## Troubleshooting
+
+### Common Issues
+
+1. **Authentication Errors**
+   - Verify Zoho OAuth app configuration
+   - Check redirect URI matches exactly
+   - Ensure proper scopes are requested
+
+2. **API Rate Limits**
+   - Implement request queuing
+   - Add caching for frequently accessed data
+   - Use batch APIs where available
+
+3. **CORS Issues**
+   - Configure Zoho API whitelist if needed
+   - Use proxy server for development if required
+
+### Development Tips
+
+1. **Mock Data**: The app includes comprehensive mock data for development
+2. **Error Handling**: API errors fall back to mock data automatically
+3. **TypeScript**: Full type safety for API responses and component props
+
+## API Reference
+
+### Key Endpoints Used
+
+```typescript
+// Employee data
+GET /people/api/forms/employee/records
+
+// Attendance data  
+GET /people/api/attendance/getAttendanceEntries
+
+// Payroll data
+GET /payroll/api/v1/employees/{id}/payslips
+
+// Leave data
+GET /people/api/leave/getLeaveEntries
+```
+
+## Support
+
+For technical support:
+- Check [Zoho People API Documentation](https://www.zoho.com/people/api/)
+- Review [Zoho Payroll API Documentation](https://www.zoho.com/payroll/api/)
+- Contact MY Management IT team for application-specific issues
+
+## License
+
+This project is proprietary software developed for MY Management internal use.
 
 ---
 
-*Built with ❤️ by National Group India*
+**Note**: This application requires active Zoho People and Payroll subscriptions. Demo mode with mock data is available for testing purposes.
