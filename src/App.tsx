@@ -3,179 +3,261 @@ import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./lib/authContext";
 import LoginPage from "./components/LoginPage";
 import EnhancedDashboard from "./components/EnhancedDashboard";
-import CSVUpload from "./components/CSVUpload";
+import PayrollDashboard from "./components/PayrollDashboard";
+import ZohoPeopleDashboard from "./components/ZohoPeopleDashboard";
 import AuthCallback from "./components/AuthCallback";
 import { Button } from "./components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
+import { Users, DollarSign, BarChart3, UserCheck, Home, TrendingUp, Calendar, AlertCircle } from "lucide-react";
+
+// Overview Dashboard Component
+function OverviewDashboard() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Project Overview */}
+        <Card className="border-amber-200 hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-amber-700">Active Projects</CardTitle>
+            <BarChart3 className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-800">12</div>
+            <p className="text-xs text-amber-600 mt-1">+2 from last month</p>
+          </CardContent>
+        </Card>
+
+        {/* CRM Overview */}
+        <Card className="border-amber-200 hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-amber-700">Total Customers</CardTitle>
+            <Users className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-800">1,247</div>
+            <p className="text-xs text-amber-600 mt-1">+15% growth</p>
+          </CardContent>
+        </Card>
+
+        {/* Finance Overview */}
+        <Card className="border-amber-200 hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-amber-700">Monthly Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-800">₹45.2L</div>
+            <p className="text-xs text-amber-600 mt-1">+8% from last month</p>
+          </CardContent>
+        </Card>
+
+        {/* People & Payroll Overview */}
+        <Card className="border-amber-200 hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-amber-700">Total Employees</CardTitle>
+            <UserCheck className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-800">156</div>
+            <p className="text-xs text-amber-600 mt-1">5 new hires this month</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Detailed Overview Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <Card className="border-amber-200">
+          <CardHeader>
+            <CardTitle className="text-amber-800 flex items-center">
+              <TrendingUp className="mr-2 h-5 w-5" />
+              Recent Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">New project "Mobile App" started</p>
+                <p className="text-xs text-gray-600">2 hours ago</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Payroll processed for August 2025</p>
+                <p className="text-xs text-gray-600">1 day ago</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">5 new customer leads added</p>
+                <p className="text-xs text-gray-600">2 days ago</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Tasks */}
+        <Card className="border-amber-200">
+          <CardHeader>
+            <CardTitle className="text-amber-800 flex items-center">
+              <Calendar className="mr-2 h-5 w-5" />
+              Upcoming Tasks
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Q2 Financial Report Due</p>
+                <p className="text-xs text-gray-600">Due in 3 days</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Employee Performance Reviews</p>
+                <p className="text-xs text-gray-600">Due in 1 week</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Client Presentation Prep</p>
+                <p className="text-xs text-gray-600">Due in 2 weeks</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <Card className="border-amber-200">
+        <CardHeader>
+          <CardTitle className="text-amber-800">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Button variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+              New Project
+            </Button>
+            <Button variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+              Add Customer
+            </Button>
+            <Button variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+              Process Payroll
+            </Button>
+            <Button variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+              Generate Report
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 // Main Dashboard Component (requires authentication)
 function DashboardContent() {
-  const [activeTab, setActiveTab] = useState<"people" | "payroll" | "project" | "crm" | "finance">("project");
+  const [activeTab, setActiveTab] = useState<"overview" | "people" | "payroll" | "project" | "crm" | "finance">("overview");
   const { user, logout } = useAuth();
 
   const modules = [
-    { id: "project", label: "Project", icon: "�" },
-    { id: "crm", label: "CRM", icon: "🤝" },
-    { id: "finance", label: "Finance", icon: "💰" },
-    { id: "people", label: "People & Payroll", icon: "�" }
+    { id: "overview", label: "Overview", icon: Home },
+    { id: "project", label: "Project", icon: BarChart3 },
+    { id: "crm", label: "CRM", icon: Users },
+    { id: "finance", label: "Finance", icon: DollarSign },
+    { id: "people", label: "People & Payroll", icon: UserCheck }
   ];
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return <OverviewDashboard />;
+      case "people":
+        return <ZohoPeopleDashboard />;
+      case "payroll":
+        return <PayrollDashboard />;
+      case "project":
+        return <EnhancedDashboard title="Project Management" type="project" />;
+      case "crm":
+        return <EnhancedDashboard title="CRM Dashboard" type="crm" />;
+      case "finance":
+        return <EnhancedDashboard title="Finance Dashboard" type="finance" />;
+      default:
+        return <OverviewDashboard />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 relative overflow-hidden">
-      {/* Gold-inspired Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-4 -left-4 w-72 h-72 bg-gradient-to-r from-amber-300/40 to-yellow-300/40 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-        <div className="absolute top-1/2 -right-4 w-72 h-72 bg-gradient-to-r from-yellow-300/40 to-orange-300/40 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-gradient-to-r from-orange-300/40 to-amber-300/40 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
-        
-        {/* Gold shimmer effect */}
-        <div className="absolute inset-0 opacity-30">
-          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="gold-shimmer" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-                <path d="M0,50 Q25,10 50,50 T100,50" stroke="#F59E0B" strokeWidth="0.5" fill="none" opacity="0.6"/>
-                <path d="M0,75 Q40,40 80,75 T160,75" stroke="#FBBF24" strokeWidth="0.3" fill="none" opacity="0.4"/>
-                <circle cx="20" cy="20" r="1" fill="#F59E0B" opacity="0.8"/>
-                <circle cx="70" cy="70" r="0.5" fill="#FBBF24" opacity="0.6"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#gold-shimmer)"/>
-          </svg>
-        </div>
-      </div>
-      
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
       {/* Header */}
-      <header className="relative z-10 bg-gradient-to-r from-amber-500/95 via-yellow-500/95 to-orange-500/95 backdrop-blur-xl border-b border-amber-300/50 shadow-2xl">
+      <header className="relative z-10 bg-gradient-to-r from-amber-100 via-yellow-100 to-orange-100 border-b border-amber-200 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-8">
-            <div className="flex-1">
-              <h1 className="text-6xl font-display font-bold text-white tracking-normal drop-shadow-2xl filter brightness-110 antialiased animate-fadeInUp">
-                Management Dashboard
-              </h1>
-              <div className="flex items-center space-x-4 mt-4">
-                <p className="text-amber-50 font-serif font-medium text-xl tracking-wide drop-shadow-lg antialiased animate-fadeInUp animation-delay-200">
-                  Advanced Business Intelligence & Analytics Platform
-                </p>
-                <div className="bg-gradient-to-r from-blue-500/80 to-indigo-600/80 px-4 py-2 rounded-full border border-blue-300/40 animate-fadeInUp animation-delay-300">
-                  <span className="text-white font-bold text-sm tracking-wider">⚡ Powered by Zoho</span>
-                </div>
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
+              <img 
+                src="/national-logo.png" 
+                alt="National Group" 
+                className="h-12 w-auto drop-shadow-sm"
+              />
+              <div>
+                <h1 className="text-2xl font-bold text-amber-800 drop-shadow-sm">
+                  National Group Dashboard
+                </h1>
+                <p className="text-sm text-amber-600">Integrated Management Platform</p>
               </div>
             </div>
             
-            {/* Enhanced Logo and Zoho Integration */}
-            <div className="flex items-center space-x-6">
-              {/* Enhanced Logo with Better Visibility */}
-              <div className="relative bg-white/95 backdrop-blur-lg rounded-2xl p-4 shadow-2xl border border-amber-200/50 hover:shadow-3xl transition-all duration-300 group">
-                <img 
-                  src="/national-logo.png" 
-                  alt="National Group Logo" 
-                  className="h-20 w-auto object-contain filter drop-shadow-xl group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 rounded-2xl blur-xl -z-10 group-hover:blur-2xl transition-all duration-300"></div>
-              </div>
-              
-              {/* Zoho Integration Badge */}
-              <div className="bg-gradient-to-r from-blue-500/90 to-indigo-600/90 backdrop-blur-lg px-5 py-3 rounded-2xl border border-blue-300/60 shadow-xl hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
-                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                    <div className="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
-                  </div>
-                  <div className="text-white">
-                    <div className="font-bold text-sm tracking-wider">🔗 ZOHO INTEGRATED</div>
-                    <div className="text-blue-100 text-xs font-medium">Real-time Data Sync</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* User Welcome */}
-              <div className="bg-gradient-to-r from-amber-100/90 to-yellow-100/90 backdrop-blur-lg px-6 py-3 rounded-2xl border border-amber-200/60 shadow-xl">
-                <span className="text-amber-800 font-light text-lg tracking-wide">Welcome, </span>
-                <span className="text-amber-900 font-semibold text-lg tracking-wide bg-gradient-to-r from-amber-700 to-yellow-700 bg-clip-text text-transparent">{user?.username}</span>
-              </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-amber-700">Welcome, {user?.username}</span>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={logout}
-                className="border-amber-300/50 text-amber-100 hover:bg-amber-400/20 backdrop-blur-sm"
+                className="border-amber-300 text-amber-700 hover:bg-amber-200 hover:border-amber-400 bg-white/50"
               >
                 Logout
               </Button>
             </div>
           </div>
+
+          {/* Tab Navigation */}
+          <div className="border-t border-amber-200/60 -mb-px">
+            <nav className="flex space-x-8" aria-label="Tabs">
+              {modules.map((module) => {
+                const Icon = module.icon;
+                const isActive = activeTab === module.id;
+                return (
+                  <button
+                    key={module.id}
+                    onClick={() => setActiveTab(module.id as any)}
+                    className={`
+                      flex items-center py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg
+                      ${isActive
+                        ? 'border-amber-500 text-amber-700 bg-white/70 shadow-sm'
+                        : 'border-transparent text-amber-600 hover:text-amber-700 hover:border-amber-300 hover:bg-white/30'
+                      }
+                    `}
+                  >
+                    <Icon className="w-5 h-5 mr-2" />
+                    {module.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <div className="relative z-10 backdrop-blur-xl border-b border-amber-300/20 sticky top-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-2 py-6 overflow-x-auto">
-            {modules.map((module) => (
-              <button
-                key={module.id}
-                onClick={() => setActiveTab(module.id as any)}
-                className={`group flex items-center space-x-3 px-8 py-4 rounded-2xl text-sm font-medium transition-all duration-500 whitespace-nowrap ${
-                  activeTab === module.id
-                    ? "bg-gradient-to-r from-amber-600/90 to-yellow-600/90 text-white shadow-2xl transform scale-105 backdrop-blur-sm border border-amber-400/50"
-                    : "text-amber-700 hover:bg-amber-500/20 border border-amber-300/30 hover:border-amber-200/60 backdrop-blur-sm hover:text-amber-800"
-                }`}
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform duration-300">{module.icon}</span>
-                <span className="font-light tracking-wide text-lg">{module.label}</span>
-                {activeTab === module.id && (
-                  <div className="w-2 h-2 bg-gradient-to-r from-yellow-200 to-amber-200 rounded-full animate-pulse shadow-lg"></div>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Dashboard Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="backdrop-blur-xl bg-white/90 rounded-3xl border border-amber-200/50 shadow-2xl p-8">
-          {activeTab === "people" && (
-            <EnhancedDashboard title="People & Payroll Management" type="people" />
-          )}
-          {activeTab === "project" && (
-            <EnhancedDashboard title="Project Management" type="project" />
-          )}
-          {activeTab === "crm" && (
-            <EnhancedDashboard title="Customer Relationship Management" type="crm" />
-          )}
-          {activeTab === "finance" && (
-            <EnhancedDashboard title="Financial Management" type="finance" />
-          )}
-        </div>
-
-        {/* CSV Upload Section */}
-        <div className="mt-8">
-          <CSVUpload 
-            title="Data Import & Export" 
-            description="Upload CSV files to import project data, employee records, or financial information"
-          />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-gradient-to-br from-white via-amber-50/20 to-yellow-50/20 rounded-xl border border-amber-200 shadow-lg backdrop-blur-sm p-8">
+          {renderContent()}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 bg-gradient-to-r from-amber-100/30 via-yellow-100/30 to-orange-100/30 backdrop-blur-xl border-t border-amber-200/40 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <p className="text-amber-800 font-serif text-lg tracking-wide">
-              National Group India - Advanced Business Intelligence Platform
-            </p>
-            <p className="text-amber-700/80 mt-2 font-light tracking-wider">
-              Powered by Next-Generation Analytics & Machine Learning
-            </p>
-            <p className="text-amber-600/60 mt-1 text-sm font-light">
-              © 2025 National Group. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
@@ -192,10 +274,10 @@ function AppContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-amber-800 font-medium">Loading...</p>
         </div>
       </div>
     );
